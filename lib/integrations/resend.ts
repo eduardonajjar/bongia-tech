@@ -1,6 +1,8 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY || 'placeholder')
+}
 const FROM = 'BongiaTech <noreply@bongiatech.com.br>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
@@ -12,7 +14,7 @@ export async function enviarBoasVindasAfiliado(dados: {
   nomeLoja: string
   linkAfiliado: string
 }) {
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: dados.email,
     subject: `Você foi convidado para o programa de afiliados da ${dados.nomeLoja}!`,
@@ -44,7 +46,7 @@ export async function enviarNotificacaoVenda(dados: {
   const comissaoFmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.valorComissao)
   const saldoFmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.saldoAtual)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: dados.email,
     subject: `Nova venda! Você ganhou ${comissaoFmt} de comissão`,
@@ -73,7 +75,7 @@ export async function enviarConfirmacaoPix(dados: {
 }) {
   const valorFmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.valor)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: dados.email,
     subject: `PIX enviado! Você recebeu ${valorFmt}`,
@@ -102,7 +104,7 @@ export async function enviarAlertaTrialExpirando(dados: {
 }) {
   const comissaoFmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(dados.comissaoTotal)
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to: dados.email,
     subject: 'Seu trial da BongiaTech expira em 3 dias',
