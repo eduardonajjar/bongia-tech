@@ -50,13 +50,16 @@ export async function obterPedido(
   return nuvemshopRequest<NuvemshopOrder>(token, storeId, 'GET', `/orders/${orderId}`)
 }
 
-export async function obterLoja(token: string, storeId: string) {
-  return nuvemshopRequest<{ id: number; name: string; url: string }>(
-    token,
-    storeId,
-    'GET',
-    '/store'
-  )
+export interface NuvemshopLoja {
+  id: number
+  name: string
+  url: string
+  email: string
+  contact_email: string
+}
+
+export async function obterLoja(token: string, storeId: string): Promise<NuvemshopLoja> {
+  return nuvemshopRequest<NuvemshopLoja>(token, storeId, 'GET', '/store')
 }
 
 export function gerarUrlOAuth(clientId: string, redirectUri: string) {
