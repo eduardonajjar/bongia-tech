@@ -12,8 +12,8 @@ interface Acumulado { lojistas: number; afiliados: number; vendas: number; volum
 function BarChart({
   data, valueKey, color,
 }: {
-  data: Record<string, number | string>[]
-  valueKey: string
+  data: MesPonto[]
+  valueKey: keyof MesPonto
   color: string
 }) {
   const vals = data.map((d) => Number(d[valueKey]))
@@ -29,7 +29,7 @@ function BarChart({
               backgroundColor: color,
               opacity: 0.8,
             }}
-            title={`${d.label}: ${fmt(vals[i])}`}
+            title={`${String(d.label)}: ${fmt(vals[i])}`}
           />
           <span className="text-gray-400" style={{ fontSize: 9, writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
             {String(d.label)}
