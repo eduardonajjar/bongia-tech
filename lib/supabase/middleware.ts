@@ -25,10 +25,10 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAuthRoute = request.nextUrl.pathname.startsWith('/login') ||
-    request.nextUrl.pathname.startsWith('/registro')
-  const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard')
-  const isAfiliadoRoute = request.nextUrl.pathname.startsWith('/afiliado')
+  const pathname = request.nextUrl.pathname
+  const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/registro')
+  const isDashboardRoute = pathname.startsWith('/dashboard')
+  const isAdminRoute = pathname.startsWith('/admin')
 
   if (isDashboardRoute && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -36,6 +36,13 @@ export async function updateSession(request: NextRequest) {
 
   if (isAuthRoute && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  if (isAdminRoute) {
+    if (!user) return NextResponse.redirect(new URL('/login', request.url))
+    if (user.email !== process.env.ADMIN_EMAIL) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
   }
 
   return supabaseResponse
