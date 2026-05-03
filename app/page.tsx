@@ -95,58 +95,51 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Planos */}
+      {/* Plano único */}
       <section className="bg-gray-50 py-20">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">Planos</h2>
-          <p className="text-gray-500 text-center mb-12">Comece resolvendo a planilha. Evolua para o PIX automático quando quiser.</p>
-          <div className="grid grid-cols-2 gap-6">
-            {/* Starter */}
-            <div className="bg-white rounded-2xl border-2 border-gray-200 p-8">
-              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Starter</p>
-              <p className="text-4xl font-bold text-gray-900 mb-1">R$149<span className="text-lg font-normal text-gray-400">/mês</span></p>
-              <p className="text-sm text-gray-500 mb-6">Até 50 afiliados ativos</p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Rastreamento ilimitado por link',
-                  'Dashboard do lojista completo',
-                  'Painel do afiliado em tempo real',
-                  'Histórico de vendas',
-                  'Exportar CSV para pagar manualmente',
-                  'Emails automáticos para afiliados',
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="text-green-500">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/registro" className="block text-center border-2 border-violet-600 text-violet-600 font-semibold py-3 rounded-xl hover:bg-violet-50 transition-colors">
-                Começar grátis
-              </Link>
+        <div className="max-w-2xl mx-auto px-6">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">Preço simples, sem surpresa</h2>
+          <p className="text-gray-500 text-center mb-12">Um plano só. Tudo incluído. Cancela quando quiser.</p>
+
+          <div className="bg-white rounded-2xl border-2 border-violet-600 p-10 shadow-lg">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <p className="text-sm font-semibold text-violet-600 uppercase tracking-wide mb-2">Plano completo</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-5xl font-bold text-gray-900">R$97</p>
+                  <p className="text-gray-400 mb-1">/mês</p>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">14 dias grátis — sem cartão</p>
+              </div>
+              <div className="bg-violet-50 text-violet-700 text-xs font-bold px-3 py-1.5 rounded-full border border-violet-200">
+                Afiliados ilimitados
+              </div>
             </div>
-            {/* Pro */}
-            <div className="bg-violet-600 rounded-2xl border-2 border-violet-600 p-8 text-white">
-              <p className="text-sm font-semibold text-violet-200 uppercase tracking-wide mb-2">Pro</p>
-              <p className="text-4xl font-bold mb-1">R$349<span className="text-lg font-normal text-violet-300">/mês</span></p>
-              <p className="text-sm text-violet-200 mb-6">Afiliados ilimitados · + 3% sobre PIX</p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Tudo do plano Starter',
-                  'Afiliados ilimitados',
-                  'Pagamento automático via PIX',
-                  'Pague todos com 1 clique',
-                  'Relatórios avançados',
-                  'Integração Asaas obrigatória',
-                ].map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-sm text-violet-100">
-                    <span className="text-violet-200">✓</span> {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/registro" className="block text-center bg-white text-violet-700 font-semibold py-3 rounded-xl hover:bg-violet-50 transition-colors">
-                Começar grátis
-              </Link>
+
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {[
+                'Rastreamento por link (cookie 30 dias)',
+                'Painel do lojista em tempo real',
+                'Portal do afiliado com login próprio',
+                'Atribuição automática de vendas',
+                'Histórico completo de comissões',
+                'Exportar CSV para pagar via PIX',
+                'Emails automáticos para afiliados',
+                'Integração nativa com Nuvemshop',
+              ].map((f) => (
+                <div key={f} className="flex items-start gap-2 text-sm text-gray-600">
+                  <span className="text-green-500 mt-0.5 shrink-0">✓</span> {f}
+                </div>
+              ))}
             </div>
+
+            <Link
+              href="/registro"
+              className="block text-center bg-violet-600 text-white font-semibold py-4 rounded-xl hover:bg-violet-700 transition-colors text-base"
+            >
+              Começar 14 dias grátis
+            </Link>
+            <p className="text-center text-xs text-gray-400 mt-3">Sem cartão de crédito. Cancela em 1 clique.</p>
           </div>
         </div>
       </section>
