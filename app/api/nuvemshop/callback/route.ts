@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     const admin = createAdminClient()
     const service = await createServiceClient()
 
-    // 3. Verificar se usuário já existe (em lojistas ou em auth.users)
+    // 3. Verificar se lojista já existe pelo email
     const { data: lojistExistente } = await service
       .from('lojistas')
       .select('id')
@@ -49,36 +49,29 @@ export async function GET(req: NextRequest) {
     let userId: string
 
     if (lojistExistente) {
-      // Lojista já existe na tabela — só loga
       userId = lojistExistente.id
     } else {
-      // Checar se já existe em auth.users (evita duplicata)
-      const { data: authList } = await admin.auth.admin.listUsers()
-      const authExistente = authList?.users?.find((u) => u.email === email)
+      // Tentar criar — se já existir em auth, pegar via listUsers com filtro
+      const { data: novoUser, error: erroCriacao } = await admin.auth.admin.createUser({
+        email,
+        email_confirm: true,
+        user_metadata: { nome },
+      })
 
-      if (authExistente) {
-        // Usuário existe em auth mas não tem registro em lojistas — criar o registro
-        userId = authExistente.id
-        await service.from('lojistas').upsert({
-          id: userId,
-          email,
-          nome,
-          plano: 'starter',
-          ativo: true,
-        }, { onConflict: 'id' })
-      } else {
-        // Primeiro acesso — criar conta Supabase (trigger handle_new_user cria registro em lojistas)
-        const { data: novoUser, error: erroCriacao } = await admin.auth.admin.createUser({
-          email,
-          email_confirm: true,
-          user_metadata: { nome },
-        })
-
-        if (erroCriacao || !novoUser.user) {
-          throw new Error(`Erro ao criar usuário: ${erroCriacao?.message}`)
-        }
-
+      if (novoUser?.user) {
         userId = novoUser.user.id
+      } else {
+        // Usuário já existe em auth.users — buscar pelo email
+        console.log('[callback] createUser falhou:', erroCriacao?.message, '— buscando usuário existente')
+        const { data: found } = await admin.auth.admin.listUsers({ perPage: 1000 })
+        const existing = found?.users?.find((u) => u.email === email)
+        if (!existing) throw new Error(`Usuário não encontrado após criar: ${erroCriacao?.message}`)
+        userId = existing.id
+        // Garantir que existe na tabela lojistas
+        await service.from('lojistas').upsert(
+          { id: userId, email, nome, plano: 'starter', ativo: true },
+          { onConflict: 'id' }
+        )
       }
     }
 
