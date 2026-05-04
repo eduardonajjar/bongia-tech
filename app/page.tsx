@@ -325,7 +325,10 @@ export default function Home() {
         maxWidth: '1200px', margin: '0 auto',
       }}>
         <span style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', color: '#6b6560', fontSize: '14px' }}>BongiaTech</span>
-        <span style={{ fontSize: '12px', color: '#4a4440', fontWeight: 300 }}>© 2026 · suporte@bongiatech.com.br</span>
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <Link href="/privacidade" style={{ fontSize: '12px', color: '#4a4440', fontWeight: 300, textDecoration: 'none' }}>Política de privacidade</Link>
+          <span style={{ fontSize: '12px', color: '#4a4440', fontWeight: 300 }}>© 2025 · suporte@bongiatech.com.br</span>
+        </div>
       </footer>
     </main>
   )
