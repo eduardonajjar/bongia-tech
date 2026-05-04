@@ -92,7 +92,8 @@ export async function GET(req: NextRequest) {
     // 7. Redirecionar para Supabase → cria sessão → cai no /dashboard
     return NextResponse.redirect(linkData.properties.action_link)
   } catch (err) {
-    console.error('[nuvemshop/callback] erro:', err)
-    return NextResponse.redirect(new URL('/login?erro=nuvemshop', req.url))
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[nuvemshop/callback] erro:', msg)
+    return NextResponse.redirect(new URL(`/login?erro=nuvemshop&detalhe=${encodeURIComponent(msg)}`, req.url))
   }
 }

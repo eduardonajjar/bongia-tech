@@ -26,6 +26,9 @@ export default function LoginPage() {
   const erroParam = typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('erro')
     : null
+  const erroDetalhe = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('detalhe')
+    : null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -70,7 +73,10 @@ export default function LoginPage() {
               background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
               color: '#f87171', padding: '10px 12px', fontSize: '13px', marginBottom: '1rem',
             }}>
-              Erro ao conectar com a Nuvemshop. Tente novamente ou use email e senha.
+              <p>Erro ao conectar com a Nuvemshop. Tente novamente ou use email e senha.</p>
+              {erroDetalhe && (
+                <p style={{ marginTop: '6px', fontSize: '11px', opacity: 0.7, wordBreak: 'break-word' }}>{erroDetalhe}</p>
+              )}
             </div>
           )}
 
