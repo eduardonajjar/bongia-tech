@@ -14,10 +14,14 @@ export async function GET(req: NextRequest) {
 
   try {
     console.log('[callback] step 1: trocando código por token')
+    // Limpa BOM e espaços que o PowerShell pode injetar nas env vars
+    const clientId = (process.env.NUVEMSHOP_CLIENT_ID || '').replace(/^﻿/, '').trim()
+    const clientSecret = (process.env.NUVEMSHOP_CLIENT_SECRET || '').replace(/^﻿/, '').trim()
+    console.log('[callback] clientId:', clientId, 'secretLen:', clientSecret.length, 'secretPrefix:', clientSecret.slice(0, 8))
     // 1. Trocar código por token Nuvemshop
     const { access_token, user_id } = await trocarCodigoPorToken(
-      process.env.NUVEMSHOP_CLIENT_ID!,
-      process.env.NUVEMSHOP_CLIENT_SECRET!,
+      clientId,
+      clientSecret,
       code
     )
 
