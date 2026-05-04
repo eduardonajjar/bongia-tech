@@ -80,13 +80,15 @@ export async function trocarCodigoPorToken(
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      client_id: clientId,
+      client_id: Number(clientId), // Nuvemshop exige número, não string
       client_secret: clientSecret,
       grant_type: 'authorization_code',
       code,
     }),
   })
 
-  if (!res.ok) throw new Error('Falha ao trocar código por token Nuvemshop')
-  return res.json()
+  const raw = await res.text()
+  console.log('[trocarToken] status:', res.status, 'body:', raw)
+  if (!res.ok) throw new Error(`Falha ao trocar código: ${raw}`)
+  return JSON.parse(raw)
 }
