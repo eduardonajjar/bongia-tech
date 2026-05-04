@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createServiceClient } from '@/lib/supabase/server'
-import { trocarCodigoPorToken, obterLoja, registrarWebhook } from '@/lib/integrations/nuvemshop'
+import { trocarCodigoPorToken, obterLoja, registrarWebhook, extrairNomeLoja } from '@/lib/integrations/nuvemshop'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    console.log('[callback] step 1: trocando código por token')
     // 1. Trocar código por token Nuvemshop
     const { access_token, user_id } = await trocarCodigoPorToken(
       process.env.NUVEMSHOP_CLIENT_ID!,
@@ -20,15 +21,17 @@ export async function GET(req: NextRequest) {
       code
     )
 
+    console.log('[callback] step 2: buscando dados da loja, user_id:', user_id)
     // 2. Buscar dados da loja (email + nome)
     const loja = await obterLoja(access_token, user_id)
     const email = loja.contact_email || loja.email
-    const nome = loja.name
+    const nome = extrairNomeLoja(loja.name)
 
     if (!email) {
       throw new Error('Não foi possível obter o email da loja Nuvemshop')
     }
 
+    console.log('[callback] step 3: email:', email, 'nome:', nome)
     const admin = createAdminClient()
     const service = await createServiceClient()
 
@@ -76,6 +79,7 @@ export async function GET(req: NextRequest) {
       `${APP_URL}/api/webhooks/nuvemshop`
     ).catch(() => {})
 
+    console.log('[callback] step 6: gerando magic link para', email)
     // 6. Gerar magic link server-side — redireciona o lojista para dentro do dashboard sem senha
     const { data: linkData, error: erroLink } = await admin.auth.admin.generateLink({
       type: 'magiclink',

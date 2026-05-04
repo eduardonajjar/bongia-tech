@@ -52,10 +52,15 @@ export async function obterPedido(
 
 export interface NuvemshopLoja {
   id: number
-  name: string
+  name: string | Record<string, string>
   url: string
   email: string
   contact_email: string
+}
+
+export function extrairNomeLoja(name: string | Record<string, string>): string {
+  if (typeof name === 'string') return name
+  return name?.pt || name?.es || name?.en || Object.values(name)[0] || 'Loja'
 }
 
 export async function obterLoja(token: string, storeId: string): Promise<NuvemshopLoja> {
