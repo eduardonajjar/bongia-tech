@@ -37,7 +37,7 @@ export default function PrivacidadePage() {
               criem e gerenciem redes de afiliados de forma simples e automatizada.
             </p>
             <p style={{ marginTop: '0.75rem' }}>
-              Contato: <a href="mailto:eduardonajjar@me.com" style={{ color: '#6b6560' }}>eduardonajjar@me.com</a>
+              Contato: <a href="mailto:suporte@bongiatech.com.br" style={{ color: '#6b6560' }}>suporte@bongiatech.com.br</a>
             </p>
           </section>
 
@@ -116,7 +116,7 @@ export default function PrivacidadePage() {
             </ul>
             <p style={{ marginTop: '0.75rem' }}>
               Para exercer qualquer um desses direitos, entre em contato pelo e-mail{' '}
-              <a href="mailto:eduardonajjar@me.com" style={{ color: '#6b6560' }}>eduardonajjar@me.com</a>.
+              <a href="mailto:suporte@bongiatech.com.br" style={{ color: '#6b6560' }}>suporte@bongiatech.com.br</a>.
               Responderemos em até 15 dias úteis.
             </p>
           </section>
@@ -164,8 +164,7 @@ export default function PrivacidadePage() {
               Para dúvidas, solicitações ou reclamações relacionadas à privacidade e proteção de dados:
             </p>
             <p style={{ marginTop: '0.5rem' }}>
-              E-mail: <a href="mailto:eduardonajjar@me.com" style={{ color: '#6b6560' }}>eduardonajjar@me.com</a><br />
-              Encarregado de Proteção de Dados (DPO): Eduardo Najjar
+              E-mail: <a href="mailto:suporte@bongiatech.com.br" style={{ color: '#6b6560' }}>suporte@bongiatech.com.br</a>
             </p>
           </section>
 
