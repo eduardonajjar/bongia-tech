@@ -43,100 +43,109 @@ export default async function AfiliadoDashboardPage({
   const loja = afiliado.lojistas as { nome: string } | null
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ minHeight: '100vh', background: '#0c0b0a', color: '#f5f3f0', fontFamily: 'var(--sans)' }}>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header style={{
+        background: '#111010', borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}>
+        <div style={{
+          maxWidth: '896px', margin: '0 auto', padding: '1rem 1.5rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
           <div>
-            <h1 className="font-bold text-gray-900">
-              Bongia<span className="text-violet-600">Tech</span>
+            <h1 style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: '1.125rem', color: '#f5f3f0', fontWeight: 400 }}>
+              BongiaTech
             </h1>
-            {loja && <p className="text-xs text-gray-500">Afiliado de {loja.nome}</p>}
+            {loja && <p style={{ fontSize: '11px', color: '#6b6560', fontWeight: 300 }}>Afiliado de {loja.nome}</p>}
           </div>
-          <div className="text-right">
-            <p className="text-sm font-semibold text-gray-900">{afiliado.nome}</p>
-            <p className="text-xs text-gray-500">{afiliado.email}</p>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{afiliado.nome}</p>
+            <p style={{ fontSize: '11px', color: '#6b6560', fontWeight: 300 }}>{afiliado.email}</p>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div style={{ maxWidth: '896px', margin: '0 auto', padding: '2rem 1.5rem' }}>
         {/* Seu link */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-3">Seu link de afiliado</h2>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '0.75rem' }}>Seu link de afiliado</h2>
           <CopiarLink link={linkAfiliado} refCode={afiliado.ref_code} />
         </div>
 
         {/* Cards de métricas */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '1px', background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(255,255,255,0.07)',
+          marginBottom: '1.5rem',
+        }}>
           {[
             {
               label: 'Cliques no link',
               value: String(afiliado.total_cliques),
               icon: MousePointerClick,
-              color: 'text-blue-600 bg-blue-50',
             },
             {
               label: 'Vendas geradas',
               value: String(vendas?.length || 0),
               icon: ShoppingBag,
-              color: 'text-violet-600 bg-violet-50',
             },
             {
               label: 'A receber',
               value: formatCurrency(afiliado.saldo),
               icon: TrendingUp,
-              color: 'text-orange-600 bg-orange-50',
             },
             {
               label: 'Total recebido',
               value: formatCurrency(totalRecebido),
               icon: DollarSign,
-              color: 'text-green-600 bg-green-50',
             },
           ].map((card) => (
-            <div key={card.label} className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className={`inline-flex p-2 rounded-lg ${card.color} mb-3`}>
-                <card.icon className="w-4 h-4" />
-              </div>
-              <p className="text-xl font-bold text-gray-900">{card.value}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
+            <div key={card.label} style={{ background: '#111010', padding: '1.5rem' }}>
+              <card.icon style={{ width: '15px', height: '15px', color: '#6b6560', marginBottom: '0.75rem' }} />
+              <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#f5f3f0', marginBottom: '4px' }}>{card.value}</p>
+              <p style={{ fontSize: '11px', color: '#6b6560', fontWeight: 300 }}>{card.label}</p>
             </div>
           ))}
         </div>
 
         {/* Histórico de vendas */}
-        <div className="bg-white rounded-xl border border-gray-200 mb-6">
-          <div className="p-5 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Minhas vendas</h2>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', marginBottom: '1.5rem' }}>
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+            <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>Minhas vendas</h2>
           </div>
           {!vendas || vendas.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>
               Nenhuma venda rastreada ainda. Compartilhe seu link para começar!
             </div>
           ) : (
-            <table className="w-full">
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="border-b border-gray-100">
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                   {['Data', 'Valor do pedido', 'Sua comissão', 'Status'].map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <th key={h} style={{
+                      padding: '10px 24px', textAlign: 'left',
+                      fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                      textTransform: 'uppercase', letterSpacing: '0.06em',
+                    }}>
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {vendas.map((v) => (
-                  <tr key={v.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-3 text-sm text-gray-500">{formatDateTime(v.criado_em)}</td>
-                    <td className="px-5 py-3 text-sm text-gray-700">{formatCurrency(v.valor_pedido)}</td>
-                    <td className="px-5 py-3 text-sm font-medium text-green-700">{formatCurrency(v.valor_comissao)}</td>
-                    <td className="px-5 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                        v.status === 'pago' ? 'bg-green-100 text-green-700' :
-                        v.status === 'confirmado' ? 'bg-blue-100 text-blue-700' :
-                        'bg-yellow-100 text-yellow-700'
-                      }`}>
+                  <tr key={v.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', fontWeight: 300 }}>{formatDateTime(v.criado_em)}</td>
+                    <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{formatCurrency(v.valor_pedido)}</td>
+                    <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{formatCurrency(v.valor_comissao)}</td>
+                    <td style={{ padding: '12px 24px' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center',
+                        padding: '2px 8px', fontSize: '11px', fontWeight: 400,
+                        border: '1px solid rgba(255,255,255,0.07)',
+                        color: v.status === 'pago' ? '#f5f3f0' : v.status === 'confirmado' ? '#6b6560' : '#d97706',
+                      }}>
                         {v.status === 'pago' ? 'Pago' : v.status === 'confirmado' ? 'Confirmado' : 'Pendente'}
                       </span>
                     </td>
@@ -147,27 +156,31 @@ export default async function AfiliadoDashboardPage({
           )}
         </div>
 
-        {/* Histórico de PIX recebidos */}
+        {/* Histórico de pagamentos recebidos */}
         {pagamentosAfiliado && pagamentosAfiliado.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200">
-            <div className="p-5 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">PIX recebidos</h2>
+          <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>Pagamentos recebidos</h2>
             </div>
-            <table className="w-full">
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr className="border-b border-gray-100">
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                   {['Data', 'Valor recebido'].map((h) => (
-                    <th key={h} className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    <th key={h} style={{
+                      padding: '10px 24px', textAlign: 'left',
+                      fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                      textTransform: 'uppercase', letterSpacing: '0.06em',
+                    }}>
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {pagamentosAfiliado.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-3 text-sm text-gray-500">{formatDateTime(p.criado_em)}</td>
-                    <td className="px-5 py-3 text-sm font-bold text-green-700">{formatCurrency(p.valor)}</td>
+                  <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', fontWeight: 300 }}>{formatDateTime(p.criado_em)}</td>
+                    <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{formatCurrency(p.valor)}</td>
                   </tr>
                 ))}
               </tbody>

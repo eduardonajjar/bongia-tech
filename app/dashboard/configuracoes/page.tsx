@@ -9,6 +9,12 @@ interface Config {
   janela_atribuicao_dias: number
 }
 
+const inputStyle: React.CSSProperties = {
+  width: '128px', background: 'transparent',
+  border: '1px solid rgba(255,255,255,0.1)', color: '#f5f3f0',
+  padding: '8px 12px', fontSize: '13px', outline: 'none',
+}
+
 export default function ConfiguracoesPage() {
   const [config, setConfig] = useState<Config>({ comissao_padrao: 10, janela_atribuicao_dias: 30 })
   const [salvando, setSalvando] = useState(false)
@@ -56,25 +62,25 @@ export default function ConfiguracoesPage() {
     setTimeout(() => setSalvo(false), 3000)
   }
 
-  if (carregando) return <div className="p-8 text-gray-400">Carregando...</div>
+  if (carregando) return <div style={{ padding: '2rem', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Carregando...</div>
 
   return (
-    <div className="p-8 max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
-        <p className="text-gray-500 text-sm mt-1">Regras do seu programa de afiliados</p>
+    <div style={{ padding: '2rem', maxWidth: '640px' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Configurações</h1>
+        <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>Regras do seu programa de afiliados</p>
       </div>
 
-      <form onSubmit={salvar} className="space-y-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+      <form onSubmit={salvar} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '4px' }}>
               Comissão padrão (%)
             </label>
-            <p className="text-xs text-gray-400 mb-2">
+            <p style={{ fontSize: '12px', color: '#4a4440', marginBottom: '10px', fontWeight: 300 }}>
               Aplicada a afiliados sem comissão personalizada
             </p>
-            <div className="flex items-center gap-2">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <input
                 type="number"
                 min="0"
@@ -82,69 +88,78 @@ export default function ConfiguracoesPage() {
                 step="0.5"
                 value={config.comissao_padrao}
                 onChange={(e) => setConfig((c) => ({ ...c, comissao_padrao: parseFloat(e.target.value) }))}
-                className="w-32 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                style={inputStyle}
               />
-              <span className="text-gray-500 text-sm">% por venda</span>
+              <span style={{ fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>% por venda</span>
             </div>
           </div>
 
-          <div className="border-t border-gray-100 pt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '4px' }}>
               Janela de atribuição (dias)
             </label>
-            <p className="text-xs text-gray-400 mb-2">
+            <p style={{ fontSize: '12px', color: '#4a4440', marginBottom: '10px', fontWeight: 300 }}>
               Quantos dias após o clique a venda ainda é creditada ao afiliado
             </p>
-            <div className="flex items-center gap-2">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <input
                 type="number"
                 min="1"
                 max="365"
                 value={config.janela_atribuicao_dias}
                 onChange={(e) => setConfig((c) => ({ ...c, janela_atribuicao_dias: parseInt(e.target.value) }))}
-                className="w-32 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                style={inputStyle}
               />
-              <span className="text-gray-500 text-sm">dias (padrão: 30)</span>
+              <span style={{ fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>dias (padrão: 30)</span>
             </div>
           </div>
         </div>
 
         {/* Plano */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Plano atual</h3>
-          <div className="grid grid-cols-2 gap-4">
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1rem' }}>Plano atual</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             {[
               { id: 'starter', label: 'Starter', preco: 'R$149/mês', limite: 'Até 50 afiliados' },
               { id: 'pro', label: 'Pro', preco: 'R$349/mês', limite: 'Afiliados ilimitados' },
             ].map((plano) => (
               <div
                 key={plano.id}
-                className="border-2 border-violet-500 rounded-xl p-4 bg-violet-50"
+                style={{
+                  border: '1px solid rgba(124,58,237,0.3)',
+                  background: 'rgba(124,58,237,0.06)',
+                  padding: '1rem',
+                }}
               >
-                <p className="font-semibold text-violet-900">{plano.label}</p>
-                <p className="text-2xl font-bold text-violet-700 mt-1">{plano.preco}</p>
-                <p className="text-sm text-violet-600 mt-1">{plano.limite}</p>
-                <p className="text-xs text-violet-500 mt-2">+ 3% sobre comissões pagas</p>
+                <p style={{ fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{plano.label}</p>
+                <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#7c3aed', marginTop: '4px' }}>{plano.preco}</p>
+                <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '4px', fontWeight: 300 }}>{plano.limite}</p>
+                <p style={{ fontSize: '11px', color: '#4a4440', marginTop: '6px', fontWeight: 300 }}>+ 3% sobre comissões pagas</p>
               </div>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-4">
+          <p style={{ fontSize: '11px', color: '#4a4440', marginTop: '1rem', fontWeight: 300 }}>
             Para alterar seu plano, entre em contato: suporte@bongiatech.com.br
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
             type="submit"
             disabled={salvando}
-            className="flex items-center gap-2 bg-violet-600 text-white px-6 py-2.5 rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium disabled:opacity-50"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: '#f5f3f0', color: '#0c0b0a',
+              padding: '10px 24px', fontSize: '13px', fontWeight: 500,
+              border: 'none', cursor: 'pointer', opacity: salvando ? 0.6 : 1,
+            }}
           >
-            <Save className="w-4 h-4" />
+            <Save style={{ width: '14px', height: '14px' }} />
             {salvando ? 'Salvando...' : 'Salvar configurações'}
           </button>
           {salvo && (
-            <div className="flex items-center gap-1.5 text-green-600 text-sm">
-              <CheckCircle className="w-4 h-4" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#4ade80', fontSize: '13px', fontWeight: 300 }}>
+              <CheckCircle style={{ width: '14px', height: '14px' }} />
               Salvo com sucesso!
             </div>
           )}

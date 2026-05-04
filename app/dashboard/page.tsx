@@ -48,100 +48,108 @@ export default async function DashboardPage() {
     .limit(1)
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Visão Geral</h1>
-        <p className="text-gray-500 text-sm mt-1">{formatDate(hoje)} · Este mês</p>
+    <div style={{ padding: '2rem' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Visão Geral</h1>
+        <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>{formatDate(hoje)} · Este mês</p>
       </div>
 
       {pendentesAntigos && pendentesAntigos.length > 0 && totalSaldo > 0 && (
-        <div className="mb-6 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+        <div style={{
+          marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
+          background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)',
+          padding: '1rem',
+        }}>
+          <AlertCircle style={{ width: '16px', height: '16px', color: '#d97706', flexShrink: 0 }} />
           <div>
-            <p className="text-sm font-medium text-amber-800">Há comissões pendentes de pagamento há mais de 30 dias</p>
-            <a href="/dashboard/pagamentos" className="text-sm text-amber-700 underline">Pagar agora →</a>
+            <p style={{ fontSize: '13px', fontWeight: 500, color: '#d97706' }}>Há comissões pendentes de pagamento há mais de 30 dias</p>
+            <a href="/dashboard/pagamentos" style={{ fontSize: '12px', color: '#d97706', textDecoration: 'underline', fontWeight: 300 }}>Pagar agora →</a>
           </div>
         </div>
       )}
 
       {/* Cards */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.07)', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.07)' }}>
         {[
           {
             label: 'Vendas via afiliados (mês)',
             value: formatCurrency(totalVendasMes),
             sub: `${numVendasMes} pedidos`,
             icon: TrendingUp,
-            color: 'text-violet-600 bg-violet-50',
           },
           {
             label: 'Comissões geradas (mês)',
             value: formatCurrency(totalComissoesMes),
             sub: 'Total acumulado',
             icon: DollarSign,
-            color: 'text-green-600 bg-green-50',
           },
           {
             label: 'Afiliados ativos',
             value: String(afiliadosAtivos),
             sub: 'Com link ativo',
             icon: Users,
-            color: 'text-blue-600 bg-blue-50',
           },
           {
             label: 'A pagar (saldo total)',
             value: formatCurrency(totalSaldo),
             sub: 'Em carteira dos afiliados',
             icon: ShoppingBag,
-            color: 'text-orange-600 bg-orange-50',
           },
         ].map((card) => (
-          <div key={card.label} className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className={`inline-flex p-2 rounded-lg ${card.color} mb-3`}>
-              <card.icon className="w-5 h-5" />
-            </div>
-            <p className="text-2xl font-bold text-gray-900">{card.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{card.label}</p>
-            <p className="text-xs text-gray-400">{card.sub}</p>
+          <div key={card.label} style={{ background: '#111010', padding: '1.5rem' }}>
+            <card.icon style={{ width: '16px', height: '16px', color: '#6b6560', marginBottom: '1rem' }} />
+            <p style={{ fontFamily: 'var(--serif)', fontSize: '1.75rem', color: '#f5f3f0', marginBottom: '4px' }}>{card.value}</p>
+            <p style={{ fontSize: '11px', color: '#6b6560', fontWeight: 300 }}>{card.label}</p>
+            <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>{card.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Top afiliados */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900">Top Afiliados</h2>
-          <a href="/dashboard/afiliados" className="text-sm text-violet-600 hover:underline">Ver todos →</a>
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{
+          padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>Top Afiliados</h2>
+          <a href="/dashboard/afiliados" style={{ fontSize: '12px', color: '#6b6560', textDecoration: 'none', fontWeight: 300 }}>Ver todos →</a>
         </div>
         {top5.length === 0 ? (
-          <div className="p-12 text-center text-gray-400">
-            <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>Nenhum afiliado ainda.</p>
-            <a href="/dashboard/afiliados" className="text-violet-600 text-sm hover:underline mt-1 block">
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b6560' }}>
+            <Users style={{ width: '40px', height: '40px', margin: '0 auto 0.75rem', opacity: 0.2 }} />
+            <p style={{ fontSize: '13px', fontWeight: 300 }}>Nenhum afiliado ainda.</p>
+            <a href="/dashboard/afiliados" style={{ color: '#f5f3f0', fontSize: '12px', textDecoration: 'underline', marginTop: '4px', display: 'block', fontWeight: 300 }}>
               Adicionar primeiro afiliado →
             </a>
           </div>
         ) : (
-          <table className="w-full">
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-gray-100">
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                 {['Afiliado', 'Total em vendas', 'Comissão a pagar', 'Status'].map((h) => (
-                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <th key={h} style={{
+                    padding: '10px 24px', textAlign: 'left',
+                    fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {top5.map((a) => (
-                <tr key={a.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900 text-sm">{a.nome}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{formatCurrency(a.total_vendas)}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-green-700">{formatCurrency(a.saldo)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      a.ativo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
+                <tr key={a.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{a.nome}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{formatCurrency(a.total_vendas)}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{formatCurrency(a.saldo)}</td>
+                  <td style={{ padding: '12px 24px' }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      padding: '2px 8px', fontSize: '11px', fontWeight: 400,
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      color: a.ativo ? '#f5f3f0' : '#6b6560',
+                    }}>
                       {a.ativo ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>

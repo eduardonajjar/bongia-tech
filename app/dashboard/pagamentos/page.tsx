@@ -32,6 +32,12 @@ interface Lojista {
 
 const TAXA = 0.03
 
+const inputStyle: React.CSSProperties = {
+  width: '100%', background: 'transparent',
+  border: '1px solid rgba(255,255,255,0.1)', color: '#f5f3f0',
+  padding: '8px 12px', fontSize: '13px', outline: 'none',
+}
+
 export default function PagamentosPage() {
   const [pendentes, setPendentes] = useState<AfiliadoPendente[]>([])
   const [historico, setHistorico] = useState<Pagamento[]>([])
@@ -123,23 +129,27 @@ export default function PagamentosPage() {
     setTimeout(() => setResultado(null), 6000)
   }
 
-  if (carregando) return <div className="p-8 text-gray-400">Carregando...</div>
+  if (carregando) return <div style={{ padding: '2rem', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Carregando...</div>
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Pagamentos</h1>
-        <p className="text-gray-500 text-sm mt-1">
+    <div style={{ padding: '2rem' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Pagamentos</h1>
+        <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>
           {isPro ? 'Pague todos os afiliados de uma vez via PIX' : 'Veja quanto deve para cada afiliado e pague manualmente'}
         </p>
       </div>
 
       {resultado && (
-        <div className={`mb-6 flex items-center gap-3 rounded-xl p-4 border ${resultado.ok ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+        <div style={{
+          marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem',
+          padding: '1rem', border: `1px solid ${resultado.ok ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
+          background: resultado.ok ? 'rgba(34,197,94,0.06)' : 'rgba(239,68,68,0.06)',
+        }}>
           {resultado.ok
-            ? <CheckCircle className="w-5 h-5 text-green-600 shrink-0" />
-            : <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />}
-          <p className={`text-sm font-medium ${resultado.ok ? 'text-green-800' : 'text-red-800'}`}>
+            ? <CheckCircle style={{ width: '16px', height: '16px', color: '#22c55e', flexShrink: 0 }} />
+            : <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />}
+          <p style={{ fontSize: '13px', fontWeight: 400, color: resultado.ok ? '#4ade80' : '#f87171' }}>
             {resultado.msg}
           </p>
         </div>
@@ -147,17 +157,25 @@ export default function PagamentosPage() {
 
       {/* Banner upgrade para Starter */}
       {!isPro && (
-        <div className="mb-6 flex items-center justify-between bg-violet-50 border border-violet-200 rounded-xl p-4">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="w-5 h-5 text-violet-600 shrink-0" />
+        <div style={{
+          marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)',
+          padding: '1rem',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <TrendingUp style={{ width: '16px', height: '16px', color: '#7c3aed', flexShrink: 0 }} />
             <div>
-              <p className="text-sm font-semibold text-violet-900">Quer pagar todos em 1 clique?</p>
-              <p className="text-xs text-violet-600 mt-0.5">Faça upgrade para o plano Pro e pague via PIX automático.</p>
+              <p style={{ fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>Quer pagar todos em 1 clique?</p>
+              <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '2px', fontWeight: 300 }}>Faça upgrade para o plano Pro e pague via PIX automático.</p>
             </div>
           </div>
           <a
             href="/dashboard/configuracoes"
-            className="shrink-0 bg-violet-600 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-violet-700 transition-colors"
+            style={{
+              flexShrink: 0, background: '#7c3aed', color: '#fff',
+              fontSize: '12px', fontWeight: 500, padding: '6px 14px',
+              textDecoration: 'none',
+            }}
           >
             Ver plano Pro
           </a>
@@ -165,32 +183,43 @@ export default function PagamentosPage() {
       )}
 
       {/* Seção a pagar */}
-      <div className="bg-white rounded-xl border border-gray-200 mb-8">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', marginBottom: '2rem' }}>
+        <div style={{
+          padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
           <div>
-            <h2 className="font-semibold text-gray-900">
+            <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>
               {isPro ? 'A pagar agora' : 'Pague seus afiliados manualmente'}
             </h2>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '2px', fontWeight: 300 }}>
               {pendentes.length} afiliados · Total: {formatCurrency(pendentes.reduce((s, a) => s + a.saldo, 0))}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div style={{ display: 'flex', gap: '8px' }}>
             {pendentes.length > 0 && (
               <button
                 onClick={exportarCSV}
-                className="flex items-center gap-2 border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: 'transparent', border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#6b6560', padding: '8px 14px', fontSize: '12px', fontWeight: 300, cursor: 'pointer',
+                }}
               >
-                <Download className="w-4 h-4" />
+                <Download style={{ width: '14px', height: '14px' }} />
                 Exportar CSV
               </button>
             )}
             {isPro && selecionados.length > 0 && (
               <button
                 onClick={() => setModalAberto(true)}
-                className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 transition-colors text-sm font-semibold"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: '#f5f3f0', color: '#0c0b0a',
+                  padding: '8px 14px', fontSize: '12px', fontWeight: 500, border: 'none', cursor: 'pointer',
+                }}
               >
-                <CreditCard className="w-4 h-4" />
+                <CreditCard style={{ width: '14px', height: '14px' }} />
                 Pagar selecionados via PIX
               </button>
             )}
@@ -198,39 +227,43 @@ export default function PagamentosPage() {
         </div>
 
         {pendentes.length === 0 ? (
-          <div className="p-12 text-center text-gray-400">
-            <CheckCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p>Nenhum afiliado com saldo pendente. Tudo em dia!</p>
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b6560' }}>
+            <CheckCircle style={{ width: '32px', height: '32px', margin: '0 auto 0.75rem', opacity: 0.2 }} />
+            <p style={{ fontSize: '13px', fontWeight: 300 }}>Nenhum afiliado com saldo pendente. Tudo em dia!</p>
           </div>
         ) : (
-          <table className="w-full">
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-gray-100">
-                {isPro && <th className="px-6 py-3 w-10"></th>}
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                {isPro && <th style={{ padding: '10px 24px', width: '40px' }}></th>}
                 {['Afiliado', 'Email', 'Chave PIX', 'Valor a receber'].map((h) => (
-                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">{h}</th>
+                  <th key={h} style={{
+                    padding: '10px 24px', textAlign: 'left',
+                    fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {pendentes.map((a) => (
-                <tr key={a.id} className={`hover:bg-gray-50 ${isPro && !a.selecionado ? 'opacity-50' : ''}`}>
+                <tr key={a.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', opacity: isPro && !a.selecionado ? 0.5 : 1 }}>
                   {isPro && (
-                    <td className="px-6 py-4">
+                    <td style={{ padding: '12px 24px' }}>
                       <input
                         type="checkbox"
                         checked={a.selecionado}
                         onChange={() => toggleAfiliado(a.id)}
-                        className="w-4 h-4 accent-violet-600 cursor-pointer"
+                        style={{ width: '14px', height: '14px', accentColor: '#7c3aed', cursor: 'pointer' }}
                       />
                     </td>
                   )}
-                  <td className="px-6 py-4 font-medium text-gray-900 text-sm">{a.nome}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{a.email}</td>
-                  <td className="px-6 py-4 text-sm font-mono text-gray-500">
-                    {a.chave_pix || <span className="text-red-400 text-xs not-italic">Sem chave PIX</span>}
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{a.nome}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{a.email}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '12px', fontFamily: 'monospace', color: '#6b6560', fontWeight: 300 }}>
+                    {a.chave_pix || <span style={{ color: '#4a4440', fontSize: '11px' }}>Sem chave PIX</span>}
                   </td>
-                  <td className="px-6 py-4 text-sm font-bold text-green-700">{formatCurrency(a.saldo)}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{formatCurrency(a.saldo)}</td>
                 </tr>
               ))}
             </tbody>
@@ -240,31 +273,36 @@ export default function PagamentosPage() {
 
       {/* Histórico */}
       {historico.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="p-6 border-b border-gray-100">
-            <h2 className="font-semibold text-gray-900">Histórico de pagamentos</h2>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+            <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>Histórico de pagamentos</h2>
           </div>
-          <table className="w-full">
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-gray-100">
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                 {['Data', 'Afiliados pagos', 'Total pago', 'Taxa BongiaTech (3%)', 'Status'].map((h) => (
-                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">{h}</th>
+                  <th key={h} style={{
+                    padding: '10px 24px', textAlign: 'left',
+                    fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {historico.map((p) => (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-500">{formatDateTime(p.criado_em)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">{p.afiliados_pagos}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{formatCurrency(p.total_pago)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{formatCurrency(p.taxa_plataforma)}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      p.status === 'concluido' ? 'bg-green-100 text-green-700' :
-                      p.status === 'erro' ? 'bg-red-100 text-red-700' :
-                      'bg-yellow-100 text-yellow-700'
-                    }`}>
+                <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', fontWeight: 300 }}>{formatDateTime(p.criado_em)}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{p.afiliados_pagos}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{formatCurrency(p.total_pago)}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{formatCurrency(p.taxa_plataforma)}</td>
+                  <td style={{ padding: '12px 24px' }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      padding: '2px 8px', fontSize: '11px', fontWeight: 400,
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      color: p.status === 'concluido' ? '#f5f3f0' : p.status === 'erro' ? '#f87171' : '#d97706',
+                    }}>
                       {p.status === 'concluido' ? 'Concluído' : p.status === 'erro' ? 'Erro' : 'Processando'}
                     </span>
                   </td>
@@ -275,67 +313,88 @@ export default function PagamentosPage() {
         </div>
       )}
 
-      {/* Modal de confirmação detalhado (Ajuste 2) */}
+      {/* Modal de confirmação */}
       {modalAberto && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
-            <div className="p-6 border-b border-gray-100 shrink-0">
-              <h2 className="font-semibold text-gray-900 text-lg">Confirme o pagamento de comissões</h2>
-              <p className="text-sm text-gray-500 mt-1">Revise cada afiliado antes de confirmar. O PIX só é enviado após sua aprovação.</p>
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem',
+        }}>
+          <div style={{
+            background: '#111010', border: '1px solid rgba(255,255,255,0.07)',
+            width: '100%', maxWidth: '512px', maxHeight: '90vh',
+            display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)', flexShrink: 0 }}>
+              <h2 style={{ fontSize: '14px', fontWeight: 400, color: '#f5f3f0' }}>Confirme o pagamento de comissões</h2>
+              <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '4px', fontWeight: 300 }}>Revise cada afiliado antes de confirmar. O PIX só é enviado após sua aprovação.</p>
             </div>
 
-            {/* Lista detalhada de afiliados */}
-            <div className="overflow-y-auto flex-1 p-6 space-y-2">
+            <div style={{ overflowY: 'auto', flex: 1, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {selecionados.map((a) => (
-                <div key={a.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3">
+                <div key={a.id} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  background: 'rgba(255,255,255,0.03)', padding: '12px 16px',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                }}>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{a.nome}</p>
-                    <p className="text-xs text-gray-500 font-mono mt-0.5">{a.chave_pix}</p>
+                    <p style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{a.nome}</p>
+                    <p style={{ fontSize: '11px', color: '#6b6560', fontFamily: 'monospace', marginTop: '2px', fontWeight: 300 }}>{a.chave_pix}</p>
                   </div>
-                  <div className="text-right shrink-0 ml-4">
-                    <p className="text-sm font-bold text-green-700">{formatCurrency(a.saldo)}</p>
+                  <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: '1rem' }}>
+                    <p style={{ fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{formatCurrency(a.saldo)}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Totais */}
-            <div className="p-6 border-t border-gray-100 shrink-0 space-y-3">
-              <div className="bg-violet-50 rounded-xl p-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Afiliados selecionados:</span>
-                  <span className="font-medium">{selecionados.length}</span>
+            <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.07)', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{
+                background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)',
+                padding: '1rem', display: 'flex', flexDirection: 'column', gap: '8px',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span style={{ color: '#6b6560', fontWeight: 300 }}>Afiliados selecionados:</span>
+                  <span style={{ color: '#f5f3f0', fontWeight: 400 }}>{selecionados.length}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Subtotal de comissões:</span>
-                  <span className="font-medium">{formatCurrency(totalSaldo)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span style={{ color: '#6b6560', fontWeight: 300 }}>Subtotal de comissões:</span>
+                  <span style={{ color: '#f5f3f0', fontWeight: 400 }}>{formatCurrency(totalSaldo)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Taxa BongiaTech (3%):</span>
-                  <span className="font-medium text-orange-600">{formatCurrency(taxaPlataforma)}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span style={{ color: '#6b6560', fontWeight: 300 }}>Taxa BongiaTech (3%):</span>
+                  <span style={{ color: '#d97706', fontWeight: 400 }}>{formatCurrency(taxaPlataforma)}</span>
                 </div>
-                <div className="border-t border-violet-200 pt-2 flex justify-between font-bold">
-                  <span className="text-gray-900">Total debitado da sua conta Asaas:</span>
-                  <span className="text-violet-700">{formatCurrency(totalSaldo)}</span>
+                <div style={{ borderTop: '1px solid rgba(124,58,237,0.15)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span style={{ color: '#f5f3f0', fontWeight: 500 }}>Total debitado da sua conta Asaas:</span>
+                  <span style={{ color: '#7c3aed', fontWeight: 600 }}>{formatCurrency(totalSaldo)}</span>
                 </div>
               </div>
-              <p className="text-xs text-gray-400">
+              <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>
                 A taxa de 3% será cobrada na sua fatura mensal separadamente.
               </p>
-              <div className="flex gap-3">
+              <div style={{ display: 'flex', gap: '12px' }}>
                 <button
                   onClick={() => setModalAberto(false)}
                   disabled={pagando}
-                  className="flex-1 border border-gray-300 rounded-lg py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+                  style={{
+                    flex: 1, background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
+                    padding: '10px', fontSize: '13px', fontWeight: 300, cursor: 'pointer', opacity: pagando ? 0.5 : 1,
+                  }}
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={confirmarPagamento}
                   disabled={pagando}
-                  className="flex-1 bg-violet-600 text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-violet-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{
+                    flex: 1, background: '#f5f3f0', color: '#0c0b0a',
+                    padding: '10px', fontSize: '13px', fontWeight: 500,
+                    border: 'none', cursor: 'pointer', opacity: pagando ? 0.6 : 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  }}
                 >
-                  {pagando && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {pagando && <Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} />}
                   {pagando ? 'Enviando PIX...' : `Confirmar e pagar ${selecionados.length} afiliados`}
                 </button>
               </div>

@@ -17,10 +17,18 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+      style={{
+        display: 'flex', alignItems: 'center', gap: '6px',
+        width: '100%', padding: '6px 10px',
+        fontSize: '13px', color: '#6b6560', fontWeight: 300,
+        background: 'none', border: 'none', cursor: 'pointer',
+        transition: 'color 0.15s',
+      }}
+      className="logout-btn"
     >
-      <LogOut className="w-4 h-4" />
+      <LogOut style={{ width: '14px', height: '14px' }} />
       Sair
+      <style>{`.logout-btn:hover { color: #f5f3f0 !important; }`}</style>
     </button>
   )
 }

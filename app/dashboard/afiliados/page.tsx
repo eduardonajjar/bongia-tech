@@ -7,6 +7,16 @@ import type { Afiliado } from '@/types/afiliado'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
+const inputStyle: React.CSSProperties = {
+  width: '100%', background: 'transparent',
+  border: '1px solid rgba(255,255,255,0.1)', color: '#f5f3f0',
+  padding: '8px 12px', fontSize: '13px', outline: 'none',
+}
+
+const labelStyle: React.CSSProperties = {
+  display: 'block', fontSize: '12px', color: '#6b6560', marginBottom: '6px', fontWeight: 400,
+}
+
 export default function AfiliadosPage() {
   const [afiliados, setAfiliados] = useState<Afiliado[]>([])
   const [filtro, setFiltro] = useState<'todos' | 'ativos' | 'inativos' | 'saldo'>('todos')
@@ -82,82 +92,97 @@ export default function AfiliadosPage() {
   })
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div style={{ padding: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Afiliados</h1>
-          <p className="text-gray-500 text-sm mt-1">{afiliados.length} afiliados cadastrados</p>
+          <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Afiliados</h1>
+          <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>{afiliados.length} afiliados cadastrados</p>
         </div>
         <button
           onClick={() => setModalAberto(true)}
-          className="flex items-center gap-2 bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: '#f5f3f0', color: '#0c0b0a',
+            padding: '8px 16px', fontSize: '13px', fontWeight: 500, border: 'none', cursor: 'pointer',
+          }}
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus style={{ width: '14px', height: '14px' }} />
           Adicionar afiliado
         </button>
       </div>
 
       {/* Filtros */}
-      <div className="flex gap-2 mb-6">
+      <div style={{ display: 'flex', gap: '4px', marginBottom: '1.5rem' }}>
         {(['todos', 'ativos', 'inativos', 'saldo'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFiltro(f)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              filtro === f
-                ? 'bg-violet-100 text-violet-700'
-                : 'text-gray-500 hover:bg-gray-100'
-            }`}
+            style={{
+              padding: '4px 12px', fontSize: '12px', fontWeight: 300, cursor: 'pointer',
+              background: filtro === f ? 'rgba(255,255,255,0.07)' : 'transparent',
+              border: '1px solid rgba(255,255,255,0.07)',
+              color: filtro === f ? '#f5f3f0' : '#6b6560',
+            }}
           >
             {f === 'todos' ? 'Todos' : f === 'ativos' ? 'Ativos' : f === 'inativos' ? 'Inativos' : 'Com saldo'}
           </button>
         ))}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)' }}>
         {carregando ? (
-          <div className="p-12 text-center text-gray-400">Carregando...</div>
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Carregando...</div>
         ) : filtrados.length === 0 ? (
-          <div className="p-12 text-center text-gray-400">Nenhum afiliado encontrado.</div>
+          <div style={{ padding: '3rem', textAlign: 'center', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Nenhum afiliado encontrado.</div>
         ) : (
-          <table className="w-full">
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr className="border-b border-gray-100">
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
                 {['Nome', 'Email', 'Vendas totais', 'Saldo a pagar', 'Cliques', 'Status', 'Link', ''].map((h) => (
-                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <th key={h} style={{
+                    padding: '10px 24px', textAlign: 'left',
+                    fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {filtrados.map((a) => (
-                <tr key={a.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-900 text-sm">{a.nome}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{a.email}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{formatCurrency(a.total_vendas)}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-green-700">{formatCurrency(a.saldo)}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{a.total_cliques}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      a.ativo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
+                <tr key={a.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{a.nome}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{a.email}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{formatCurrency(a.total_vendas)}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{formatCurrency(a.saldo)}</td>
+                  <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>{a.total_cliques}</td>
+                  <td style={{ padding: '12px 24px' }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      padding: '2px 8px', fontSize: '11px', fontWeight: 400,
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      color: a.ativo ? '#f5f3f0' : '#6b6560',
+                    }}>
                       {a.ativo ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
+                  <td style={{ padding: '12px 24px' }}>
                     <button
                       onClick={() => copiarLink(a.ref_code)}
-                      className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-800"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        fontSize: '12px', color: '#6b6560', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 300,
+                      }}
                     >
-                      {copiado === a.ref_code ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                      {copiado === a.ref_code ? <Check style={{ width: '12px', height: '12px' }} /> : <Copy style={{ width: '12px', height: '12px' }} />}
                       {copiado === a.ref_code ? 'Copiado!' : 'Copiar link'}
                     </button>
                   </td>
-                  <td className="px-6 py-4">
+                  <td style={{ padding: '12px 24px' }}>
                     <button
                       onClick={() => toggleAtivo(a.id, a.ativo)}
-                      className="text-xs text-gray-400 hover:text-gray-600"
+                      style={{ fontSize: '12px', color: '#4a4440', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 300 }}
                     >
                       {a.ativo ? 'Desativar' : 'Ativar'}
                     </button>
@@ -171,35 +196,38 @@ export default function AfiliadosPage() {
 
       {/* Modal adicionar */}
       {modalAberto && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="font-semibold text-gray-900">Adicionar afiliado</h2>
-              <p className="text-sm text-gray-500 mt-0.5">O afiliado receberá um email com o link dele.</p>
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '1rem',
+        }}>
+          <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', width: '100%', maxWidth: '448px' }}>
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+              <h2 style={{ fontSize: '14px', fontWeight: 400, color: '#f5f3f0' }}>Adicionar afiliado</h2>
+              <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '4px', fontWeight: 300 }}>O afiliado receberá um email com o link dele.</p>
             </div>
-            <form onSubmit={adicionar} className="p-6 space-y-4">
+            <form onSubmit={adicionar} style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                <label style={labelStyle}>Nome</label>
                 <input
                   type="text"
                   value={form.nome}
                   onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  style={inputStyle}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label style={labelStyle}>Email</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  style={inputStyle}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Comissão % (opcional)</label>
+                <label style={labelStyle}>Comissão % (opcional)</label>
                 <input
                   type="number"
                   min="0"
@@ -208,16 +236,16 @@ export default function AfiliadosPage() {
                   value={form.comissao}
                   onChange={(e) => setForm((f) => ({ ...f, comissao: e.target.value }))}
                   placeholder="Usa o padrão da loja se vazio"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  style={inputStyle}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Tipo PIX</label>
+                  <label style={labelStyle}>Tipo PIX</label>
                   <select
                     value={form.tipo_pix}
                     onChange={(e) => setForm((f) => ({ ...f, tipo_pix: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    style={{ ...inputStyle, color: '#f5f3f0' }}
                   >
                     <option value="cpf">CPF</option>
                     <option value="email">Email</option>
@@ -226,32 +254,44 @@ export default function AfiliadosPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Chave PIX</label>
+                  <label style={labelStyle}>Chave PIX</label>
                   <input
                     type="text"
                     value={form.chave_pix}
                     onChange={(e) => setForm((f) => ({ ...f, chave_pix: e.target.value }))}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    style={inputStyle}
                   />
                 </div>
               </div>
 
               {erro && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">{erro}</p>
+                <p style={{
+                  fontSize: '13px', color: '#f87171',
+                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                  padding: '10px 12px',
+                }}>{erro}</p>
               )}
 
-              <div className="flex gap-3 pt-2">
+              <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
                 <button
                   type="button"
                   onClick={() => { setModalAberto(false); setErro('') }}
-                  className="flex-1 border border-gray-300 rounded-lg py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  style={{
+                    flex: 1, background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
+                    padding: '10px', fontSize: '13px', fontWeight: 300, cursor: 'pointer',
+                  }}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={enviando}
-                  className="flex-1 bg-violet-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-violet-700 disabled:opacity-50"
+                  style={{
+                    flex: 1, background: '#f5f3f0', color: '#0c0b0a',
+                    padding: '10px', fontSize: '13px', fontWeight: 500,
+                    border: 'none', cursor: 'pointer', opacity: enviando ? 0.6 : 1,
+                  }}
                 >
                   {enviando ? 'Adicionando...' : 'Adicionar'}
                 </button>

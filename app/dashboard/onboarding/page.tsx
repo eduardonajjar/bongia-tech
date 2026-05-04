@@ -8,6 +8,16 @@ import { createClient } from '@/lib/supabase/client'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 const NUVEMSHOP_CLIENT_ID = process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || ''
 
+const inputStyle: React.CSSProperties = {
+  width: '100%', background: 'transparent',
+  border: '1px solid rgba(255,255,255,0.1)', color: '#f5f3f0',
+  padding: '10px 12px', fontSize: '13px', outline: 'none',
+}
+
+const labelStyle: React.CSSProperties = {
+  display: 'block', fontSize: '12px', color: '#6b6560', marginBottom: '6px', fontWeight: 400,
+}
+
 export default function OnboardingPage() {
   const router = useRouter()
   const [passo, setPasso] = useState(1)
@@ -69,92 +79,112 @@ export default function OnboardingPage() {
   const link = afiliado ? `${APP_URL}/loja?ref=${afiliado.ref_code}` : ''
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-purple-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-xl">
+    <div style={{
+      minHeight: '100vh', background: '#0c0b0a',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+    }}>
+      <div style={{ width: '100%', maxWidth: '544px' }}>
         {/* Confetes animados */}
         {confete && (
-          <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-8xl mb-4 animate-bounce">🎉</div>
-              <p className="text-2xl font-bold text-violet-700">Tudo pronto!</p>
-              <p className="text-gray-600 mt-2">Agora é só mandar o link para {afiliado?.nome} e esperar as vendas chegarem.</p>
+          <div style={{
+            position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 50,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '5rem', marginBottom: '1rem', animation: 'bounce 1s infinite' }}>🎉</div>
+              <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#f5f3f0' }}>Tudo pronto!</p>
+              <p style={{ color: '#6b6560', marginTop: '8px', fontSize: '14px', fontWeight: 300 }}>
+                Agora é só mandar o link para {afiliado?.nome} e esperar as vendas chegarem.
+              </p>
             </div>
           </div>
         )}
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
-            Bongia<span className="text-violet-600">Tech</span>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: '1.5rem', color: '#f5f3f0', fontWeight: 400 }}>
+            BongiaTech
           </h1>
-          <p className="text-gray-500 mt-1">Configure em 3 passos</p>
+          <p style={{ color: '#6b6560', marginTop: '4px', fontSize: '13px', fontWeight: 300 }}>Configure em 3 passos</p>
         </div>
 
         {/* Progress */}
-        <div className="flex items-center gap-2 mb-8">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2rem' }}>
           {[1, 2, 3].map((n) => (
-            <div key={n} className="flex items-center gap-2 flex-1">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${
-                passo > n ? 'bg-green-500 text-white' :
-                passo === n ? 'bg-violet-600 text-white' :
-                'bg-gray-200 text-gray-400'
-              }`}>
-                {passo > n ? <Check className="w-4 h-4" /> : n}
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+              <div style={{
+                width: '32px', height: '32px', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '13px', fontWeight: 500, border: '1px solid',
+                background: passo > n ? 'transparent' : passo === n ? '#f5f3f0' : 'transparent',
+                borderColor: passo > n ? 'rgba(74,222,128,0.4)' : passo === n ? '#f5f3f0' : 'rgba(255,255,255,0.1)',
+                color: passo > n ? '#4ade80' : passo === n ? '#0c0b0a' : '#6b6560',
+              }}>
+                {passo > n ? <Check style={{ width: '14px', height: '14px' }} /> : n}
               </div>
-              {n < 3 && <div className={`flex-1 h-1 rounded ${passo > n ? 'bg-green-400' : 'bg-gray-200'}`} />}
+              {n < 3 && (
+                <div style={{
+                  flex: 1, height: '1px',
+                  background: passo > n ? 'rgba(74,222,128,0.4)' : 'rgba(255,255,255,0.07)',
+                }} />
+              )}
             </div>
           ))}
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)' }}>
           {/* Passo 1 — Adicionar primeiro afiliado */}
           {passo === 1 && (
-            <div className="p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Adicione seu primeiro afiliado</h2>
-              <p className="text-gray-500 text-sm mb-6">O sistema vai gerar um link rastreável único para ele.</p>
+            <div style={{ padding: '2rem' }}>
+              <h2 style={{ fontSize: '1.125rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)', marginBottom: '4px' }}>
+                Adicione seu primeiro afiliado
+              </h2>
+              <p style={{ color: '#6b6560', fontSize: '13px', marginBottom: '1.5rem', fontWeight: 300 }}>
+                O sistema vai gerar um link rastreável único para ele.
+              </p>
 
-              <form onSubmit={adicionarAfiliado} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nome do afiliado</label>
+              <form onSubmit={adicionarAfiliado} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={labelStyle}>Nome do afiliado</label>
                     <input
                       type="text"
                       value={form.nome}
                       onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      style={inputStyle}
                       placeholder="João Silva"
                       required
                     />
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={labelStyle}>Email</label>
                     <input
                       type="email"
                       value={form.email}
                       onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      style={inputStyle}
                       placeholder="joao@email.com"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Comissão (%)</label>
+                    <label style={labelStyle}>Comissão (%)</label>
                     <input
                       type="number"
                       min="1"
                       max="100"
                       value={form.comissao}
                       onChange={(e) => setForm((f) => ({ ...f, comissao: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      style={inputStyle}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipo PIX</label>
+                    <label style={labelStyle}>Tipo PIX</label>
                     <select
                       value={form.tipo_pix}
                       onChange={(e) => setForm((f) => ({ ...f, tipo_pix: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      style={{ ...inputStyle, color: '#f5f3f0' }}
                     >
                       <option value="cpf">CPF</option>
                       <option value="email">Email</option>
@@ -162,27 +192,38 @@ export default function OnboardingPage() {
                       <option value="chave_aleatoria">Chave aleatória</option>
                     </select>
                   </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Chave PIX (opcional agora)</label>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={labelStyle}>Chave PIX (opcional agora)</label>
                     <input
                       type="text"
                       value={form.chave_pix}
                       onChange={(e) => setForm((f) => ({ ...f, chave_pix: e.target.value }))}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      style={inputStyle}
                       placeholder="Pode adicionar depois"
                     />
                   </div>
                 </div>
 
-                {erro && <p className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">{erro}</p>}
+                {erro && (
+                  <p style={{
+                    fontSize: '13px', color: '#f87171',
+                    background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                    padding: '10px 12px',
+                  }}>{erro}</p>
+                )}
 
                 <button
                   type="submit"
                   disabled={enviando}
-                  className="w-full bg-violet-600 text-white rounded-xl py-3 font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  style={{
+                    width: '100%', background: '#f5f3f0', color: '#0c0b0a',
+                    padding: '12px', fontSize: '14px', fontWeight: 500,
+                    border: 'none', cursor: 'pointer', opacity: enviando ? 0.6 : 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                  }}
                 >
                   {enviando ? 'Adicionando...' : 'Adicionar e continuar'}
-                  {!enviando && <ChevronRight className="w-4 h-4" />}
+                  {!enviando && <ChevronRight style={{ width: '16px', height: '16px' }} />}
                 </button>
               </form>
             </div>
@@ -190,68 +231,102 @@ export default function OnboardingPage() {
 
           {/* Passo 2 — Link rastreável */}
           {passo === 2 && afiliado && (
-            <div className="p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Copie o link do {afiliado.nome}</h2>
-              <p className="text-gray-500 text-sm mb-6">
+            <div style={{ padding: '2rem' }}>
+              <h2 style={{ fontSize: '1.125rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)', marginBottom: '4px' }}>
+                Copie o link do {afiliado.nome}
+              </h2>
+              <p style={{ color: '#6b6560', fontSize: '13px', marginBottom: '1.5rem', fontWeight: 300 }}>
                 Mande esse link para seu afiliado. Quando alguém clicar e comprar, a venda aparece automaticamente no seu painel.
               </p>
 
-              <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 mb-6">
-                <p className="text-xs font-medium text-violet-700 mb-2">Link de afiliado gerado:</p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 text-xs text-violet-900 break-all">{link}</code>
+              <div style={{
+                background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)',
+                padding: '1rem', marginBottom: '1.5rem',
+              }}>
+                <p style={{ fontSize: '11px', fontWeight: 400, color: '#6b6560', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Link de afiliado gerado:
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <code style={{ flex: 1, fontSize: '12px', color: '#f5f3f0', wordBreak: 'break-all', fontFamily: 'monospace' }}>{link}</code>
                   <button
                     onClick={copiarLink}
-                    className="shrink-0 flex items-center gap-1.5 bg-violet-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-violet-700 transition-colors"
+                    style={{
+                      flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px',
+                      background: '#f5f3f0', color: '#0c0b0a',
+                      fontSize: '12px', fontWeight: 500, padding: '6px 12px',
+                      border: 'none', cursor: 'pointer',
+                    }}
                   >
-                    {copiado ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    {copiado ? <Check style={{ width: '12px', height: '12px' }} /> : <Copy style={{ width: '12px', height: '12px' }} />}
                     {copiado ? 'Copiado!' : 'Copiar'}
                   </button>
                 </div>
               </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex gap-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-800">
+              <div style={{
+                background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)',
+                padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '10px',
+              }}>
+                <AlertTriangle style={{ width: '14px', height: '14px', color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+                <p style={{ fontSize: '13px', color: '#d97706', fontWeight: 300 }}>
                   Esse link <strong>não tem desconto visível</strong> — então não vaza para o Pelando ou Zoom. Só grava um cookie invisível quando alguém clica.
                 </p>
               </div>
 
               <button
                 onClick={() => setPasso(3)}
-                className="w-full bg-violet-600 text-white rounded-xl py-3 font-semibold hover:bg-violet-700 transition-colors flex items-center justify-center gap-2"
+                style={{
+                  width: '100%', background: '#f5f3f0', color: '#0c0b0a',
+                  padding: '12px', fontSize: '14px', fontWeight: 500,
+                  border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                }}
               >
-                Continuar <ChevronRight className="w-4 h-4" />
+                Continuar <ChevronRight style={{ width: '16px', height: '16px' }} />
               </button>
             </div>
           )}
 
           {/* Passo 3 — Conectar Nuvemshop */}
           {passo === 3 && (
-            <div className="p-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-1">Conecte sua loja Nuvemshop</h2>
-              <p className="text-gray-500 text-sm mb-6">
+            <div style={{ padding: '2rem' }}>
+              <h2 style={{ fontSize: '1.125rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)', marginBottom: '4px' }}>
+                Conecte sua loja Nuvemshop
+              </h2>
+              <p style={{ color: '#6b6560', fontSize: '13px', marginBottom: '1.5rem', fontWeight: 300 }}>
                 Para as vendas aparecerem automaticamente, precisamos receber os pedidos da sua loja.
               </p>
 
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex gap-3">
-                <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-800">
+              <div style={{
+                background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
+                padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '10px',
+              }}>
+                <AlertTriangle style={{ width: '14px', height: '14px', color: '#f87171', flexShrink: 0, marginTop: '2px' }} />
+                <p style={{ fontSize: '13px', color: '#f87171', fontWeight: 300 }}>
                   <strong>Sem conectar a loja,</strong> as vendas não são registradas automaticamente. Você pode fazer isso agora ou depois em Integrações.
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <a
                   href={`https://www.nuvemshop.com.br/apps/${NUVEMSHOP_CLIENT_ID}/authorize?redirect_uri=${encodeURIComponent(`${APP_URL}/api/nuvemshop/callback`)}`}
-                  className="flex items-center justify-center gap-2 w-full bg-violet-600 text-white rounded-xl py-3 font-semibold hover:bg-violet-700 transition-colors"
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    width: '100%', background: '#7c3aed', color: '#fff',
+                    padding: '12px', textDecoration: 'none',
+                    fontSize: '14px', fontWeight: 500,
+                  }}
                 >
-                  <Link2 className="w-4 h-4" />
+                  <Link2 style={{ width: '16px', height: '16px' }} />
                   Conectar loja Nuvemshop agora
                 </a>
                 <button
                   onClick={concluir}
-                  className="w-full border border-gray-300 text-gray-600 rounded-xl py-3 font-medium hover:bg-gray-50 transition-colors text-sm"
+                  style={{
+                    width: '100%', background: 'transparent',
+                    border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
+                    padding: '12px', fontSize: '13px', fontWeight: 300, cursor: 'pointer',
+                  }}
                 >
                   Pular por agora — vou conectar depois
                 </button>

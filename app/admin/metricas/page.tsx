@@ -19,19 +19,18 @@ function BarChart({
   const vals = data.map((d) => Number(d[valueKey]))
   const max = Math.max(...vals, 1)
   return (
-    <div className="flex items-end gap-1 h-40 w-full">
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '160px', width: '100%' }}>
       {data.map((d, i) => (
-        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           <div
-            className="w-full rounded-t min-h-[2px] transition-all"
             style={{
+              width: '100%', minHeight: '2px',
               height: `${(vals[i] / max) * 100}%`,
-              backgroundColor: color,
-              opacity: 0.8,
+              background: color, opacity: 0.8,
             }}
             title={`${String(d.label)}: ${fmt(vals[i])}`}
           />
-          <span className="text-gray-400" style={{ fontSize: 9, writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
+          <span style={{ color: '#4a4440', fontSize: '9px', writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}>
             {String(d.label)}
           </span>
         </div>
@@ -52,20 +51,25 @@ export default function AdminMetricasPage() {
     fetch('/api/admin/metricas').then((r) => r.json()).then(setDados).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <div className="p-8 text-gray-400">Carregando...</div>
+  if (loading) return <div style={{ padding: '2rem', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Carregando...</div>
   if (!dados) return null
 
   const { receitaPorMes, topLojistas, acumulado } = dados
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Métricas</h1>
-        <p className="text-gray-500 text-sm mt-1">Receita e volume dos últimos 12 meses</p>
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Métricas</h1>
+        <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>Receita e volume dos últimos 12 meses</p>
       </div>
 
       {/* Totais acumulados */}
-      <div className="grid grid-cols-5 gap-3 mb-8">
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
+        gap: '1px', background: 'rgba(255,255,255,0.07)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        marginBottom: '2rem',
+      }}>
         {[
           { label: 'Lojistas', value: acumulado.lojistas },
           { label: 'Afiliados', value: acumulado.afiliados },
@@ -73,63 +77,69 @@ export default function AdminMetricasPage() {
           { label: 'Volume em comissões', value: fmt(acumulado.volume) },
           { label: 'Receita da plataforma', value: fmt(acumulado.receita) },
         ].map((m) => (
-          <div key={m.label} className="bg-white rounded-xl border border-gray-200 p-4">
-            <p className="text-xs text-gray-400 mb-1">{m.label}</p>
-            <p className="text-xl font-bold text-gray-900">{m.value}</p>
+          <div key={m.label} style={{ background: '#111010', padding: '1.5rem' }}>
+            <p style={{ fontSize: '11px', color: '#4a4440', marginBottom: '6px', fontWeight: 300 }}>{m.label}</p>
+            <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#f5f3f0' }}>{m.value}</p>
           </div>
         ))}
       </div>
 
       {/* Gráficos lado a lado */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-1">Receita da plataforma</h2>
-          <p className="text-xs text-gray-400 mb-4">Últimos 12 meses (3% sobre PIX)</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '4px' }}>Receita da plataforma</h2>
+          <p style={{ fontSize: '11px', color: '#4a4440', marginBottom: '1rem', fontWeight: 300 }}>Últimos 12 meses (3% sobre PIX)</p>
           <BarChart data={receitaPorMes} valueKey="receita" color="#7c3aed" />
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-1">Volume transacionado</h2>
-          <p className="text-xs text-gray-400 mb-4">Últimos 12 meses (total de comissões pagas)</p>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '4px' }}>Volume transacionado</h2>
+          <p style={{ fontSize: '11px', color: '#4a4440', marginBottom: '1rem', fontWeight: 300 }}>Últimos 12 meses (total de comissões pagas)</p>
           <BarChart data={receitaPorMes} valueKey="volume" color="#059669" />
         </div>
       </div>
 
       {/* Top 10 lojistas */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-4">Top 10 lojistas por receita gerada</h2>
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+        <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1rem' }}>Top 10 lojistas por receita gerada</h2>
         {topLojistas.filter((l) => l.taxa > 0).length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-8">
+          <p style={{ fontSize: '13px', color: '#6b6560', textAlign: 'center', padding: '2rem 0', fontWeight: 300 }}>
             Nenhum lojista fez pagamento via PIX ainda
           </p>
         ) : (
-          <table className="w-full text-sm">
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">#</th>
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Lojista</th>
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Plano</th>
-                <th className="text-right py-2 text-xs font-semibold text-gray-500 uppercase">Volume</th>
-                <th className="text-right py-2 text-xs font-semibold text-gray-500 uppercase">Taxa gerada</th>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                {['#', 'Lojista', 'Plano', 'Volume', 'Taxa gerada'].map((h) => (
+                  <th key={h} style={{
+                    padding: '8px 0', textAlign: h === 'Volume' || h === 'Taxa gerada' ? 'right' : 'left',
+                    fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {topLojistas.filter((l) => l.taxa > 0).map((l, i) => (
-                <tr key={l.id} className="border-b border-gray-50">
-                  <td className="py-2.5 text-gray-400 font-mono text-xs">#{i + 1}</td>
-                  <td className="py-2.5">
-                    <p className="font-medium text-gray-900">{l.nome}</p>
-                    <p className="text-xs text-gray-400">{l.email}</p>
+                <tr key={l.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '10px 0', color: '#4a4440', fontFamily: 'monospace', fontSize: '11px', fontWeight: 300 }}>#{i + 1}</td>
+                  <td style={{ padding: '10px 0' }}>
+                    <p style={{ fontWeight: 400, color: '#f5f3f0' }}>{l.nome}</p>
+                    <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>{l.email}</p>
                   </td>
-                  <td className="py-2.5">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      l.plano === 'pro' ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-600'
-                    }`}>
+                  <td style={{ padding: '10px 0' }}>
+                    <span style={{
+                      fontSize: '11px', padding: '2px 8px',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      color: l.plano === 'pro' ? '#7c3aed' : '#6b6560', fontWeight: 400,
+                    }}>
                       {l.plano}
                     </span>
                   </td>
-                  <td className="py-2.5 text-right text-gray-700">{fmt(l.volume)}</td>
-                  <td className="py-2.5 text-right font-bold text-green-700">{fmt(l.taxa)}</td>
+                  <td style={{ padding: '10px 0', textAlign: 'right', color: '#6b6560', fontWeight: 300 }}>{fmt(l.volume)}</td>
+                  <td style={{ padding: '10px 0', textAlign: 'right', fontWeight: 500, color: '#f5f3f0' }}>{fmt(l.taxa)}</td>
                 </tr>
               ))}
             </tbody>

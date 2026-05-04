@@ -20,40 +20,64 @@ export default function CopiarLink({ link, refCode }: Props) {
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`Compre pelo meu link e aproveite: ${link}`)}`
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg p-3">
-        <code className="flex-1 text-sm text-gray-700 break-all">{link}</code>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '8px',
+        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+        padding: '12px',
+      }}>
+        <code style={{ flex: 1, fontSize: '13px', color: '#6b6560', wordBreak: 'break-all', fontFamily: 'monospace', fontWeight: 300 }}>{link}</code>
         <button
           onClick={copiar}
-          className="shrink-0 flex items-center gap-1.5 text-sm font-medium text-violet-600 hover:text-violet-800 bg-white border border-violet-200 px-3 py-1.5 rounded-lg transition-colors"
+          style={{
+            flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px',
+            fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+            background: '#f5f3f0', color: '#0c0b0a',
+            border: 'none', padding: '6px 12px',
+          }}
         >
-          {copiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+          {copiado ? <Check style={{ width: '14px', height: '14px' }} /> : <Copy style={{ width: '14px', height: '14px' }} />}
           {copiado ? 'Copiado!' : 'Copiar'}
         </button>
       </div>
 
-      <div className="flex gap-2">
+      <div style={{ display: 'flex', gap: '8px' }}>
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-600 transition-colors"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: '#25d366', color: '#fff',
+            padding: '8px 14px', textDecoration: 'none',
+            fontSize: '13px', fontWeight: 500,
+          }}
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle style={{ width: '14px', height: '14px' }} />
           WhatsApp
         </a>
         <button
           onClick={copiar}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045)',
+            color: '#fff', padding: '8px 14px',
+            fontSize: '13px', fontWeight: 500, border: 'none', cursor: 'pointer',
+          }}
         >
-          <Share2 className="w-4 h-4" />
+          <Share2 style={{ width: '14px', height: '14px' }} />
           Instagram (copiar)
         </button>
         <button
           onClick={copiar}
-          className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: '#141312', color: '#f5f3f0',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '8px 14px', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+          }}
         >
-          <Video className="w-4 h-4" />
+          <Video style={{ width: '14px', height: '14px' }} />
           TikTok (copiar)
         </button>
       </div>

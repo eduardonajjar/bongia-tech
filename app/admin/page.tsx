@@ -28,12 +28,14 @@ interface Stats {
 function MiniBar({ data }: { data: { dia: string; total: number }[] }) {
   const max = Math.max(...data.map((d) => d.total), 1)
   return (
-    <div className="flex items-end gap-0.5 h-16 w-full">
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '64px', width: '100%' }}>
       {data.map((d, i) => (
-        <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
           <div
-            className="w-full bg-violet-400 rounded-sm min-h-[2px]"
-            style={{ height: `${(d.total / max) * 100}%` }}
+            style={{
+              width: '100%', background: '#7c3aed', minHeight: '2px',
+              height: `${(d.total / max) * 100}%`, opacity: 0.7,
+            }}
             title={`${fmtData(d.dia)}: ${d.total}`}
           />
         </div>
@@ -64,8 +66,8 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="p-8 flex items-center justify-center h-full">
-        <div className="text-gray-400">Carregando métricas...</div>
+      <div style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+        <div style={{ color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Carregando métricas...</div>
       </div>
     )
   }
@@ -73,62 +75,73 @@ export default function AdminPage() {
   if (!stats) return null
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Visão Geral</h1>
-        <p className="text-gray-500 text-sm mt-1">Dados em tempo real da plataforma</p>
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Visão Geral</h1>
+        <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>Dados em tempo real da plataforma</p>
       </div>
 
       {/* Cards de métricas */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '1px', background: 'rgba(255,255,255,0.07)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        marginBottom: '2rem',
+      }}>
         {[
-          { label: 'Total de lojistas', value: stats.totalLojistas, icon: Users, color: 'violet' },
-          { label: 'Em trial agora', value: stats.emTrial, icon: Clock, color: 'amber' },
-          { label: 'Convertidos', value: stats.convertidos, icon: TrendingUp, color: 'green' },
-          { label: 'Receita do mês', value: fmt(stats.receitaMes), icon: DollarSign, color: 'blue' },
+          { label: 'Total de lojistas', value: stats.totalLojistas, icon: Users },
+          { label: 'Em trial agora', value: stats.emTrial, icon: Clock },
+          { label: 'Convertidos', value: stats.convertidos, icon: TrendingUp },
+          { label: 'Receita do mês', value: fmt(stats.receitaMes), icon: DollarSign },
         ].map((c) => (
-          <div key={c.label} className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">{c.label}</span>
-              <c.icon className="w-4 h-4 text-gray-400" />
+          <div key={c.label} style={{ background: '#111010', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+              <span style={{ fontSize: '11px', color: '#6b6560', fontWeight: 300 }}>{c.label}</span>
+              <c.icon style={{ width: '14px', height: '14px', color: '#4a4440' }} />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{c.value}</p>
+            <p style={{ fontFamily: 'var(--serif)', fontSize: '1.75rem', color: '#f5f3f0' }}>{c.value}</p>
           </div>
         ))}
       </div>
 
       {/* Gráfico novos cadastros */}
       {stats.novosPorDia.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Novos cadastros — últimos 30 dias</h2>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1rem' }}>Novos cadastros — últimos 30 dias</h2>
           <MiniBar data={stats.novosPorDia} />
-          <p className="text-xs text-gray-400 mt-2">Cada coluna = 1 dia</p>
+          <p style={{ fontSize: '11px', color: '#4a4440', marginTop: '8px', fontWeight: 300 }}>Cada coluna = 1 dia</p>
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
         {/* Trials expirando */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-1">Trials expirando em 7 dias</h2>
-          <p className="text-xs text-gray-400 mb-4">Leads mais quentes para conversão</p>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '4px' }}>Trials expirando em 7 dias</h2>
+          <p style={{ fontSize: '11px', color: '#4a4440', marginBottom: '1rem', fontWeight: 300 }}>Leads mais quentes para conversão</p>
           {stats.trialsExpirando.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Nenhum trial expirando em breve</p>
+            <p style={{ fontSize: '13px', color: '#6b6560', textAlign: 'center', padding: '1.5rem 0', fontWeight: 300 }}>Nenhum trial expirando em breve</p>
           ) : (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {stats.trialsExpirando.map((l) => (
-                <div key={l.id} className="flex items-center justify-between">
+                <div key={l.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{l.nome}</p>
-                    <p className="text-xs text-gray-400">
+                    <p style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{l.nome}</p>
+                    <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>
                       {l.email} · expira {fmtData(l.trial_ate)} · {l.afiliados} afil. · {l.vendas} vendas
                     </p>
                   </div>
                   <button
                     onClick={() => enviarEmail(l.email, l.nome)}
                     disabled={emailEnviando === l.email}
-                    className="flex items-center gap-1 text-xs bg-amber-50 border border-amber-200 text-amber-700 px-2 py-1 rounded-lg hover:bg-amber-100 transition-colors disabled:opacity-50"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '4px',
+                      fontSize: '11px', cursor: 'pointer',
+                      background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.15)',
+                      color: '#d97706', padding: '4px 8px', fontWeight: 400,
+                      opacity: emailEnviando === l.email ? 0.5 : 1,
+                    }}
                   >
-                    <Mail className="w-3 h-3" />
+                    <Mail style={{ width: '12px', height: '12px' }} />
                     {emailEnviando === l.email ? 'Enviando...' : 'Email'}
                   </button>
                 </div>
@@ -138,26 +151,27 @@ export default function AdminPage() {
         </div>
 
         {/* Últimos cadastros */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Últimos cadastros</h2>
+        <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1rem' }}>Últimos cadastros</h2>
           {stats.ultimosCadastros.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Sem cadastros ainda</p>
+            <p style={{ fontSize: '13px', color: '#6b6560', textAlign: 'center', padding: '1.5rem 0', fontWeight: 300 }}>Sem cadastros ainda</p>
           ) : (
-            <div className="space-y-3">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {stats.ultimosCadastros.map((l) => (
-                <div key={l.id} className="flex items-center justify-between">
+                <div key={l.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{l.nome}</p>
-                    <p className="text-xs text-gray-400">{l.email}</p>
+                    <p style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>{l.nome}</p>
+                    <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>{l.email}</p>
                   </div>
-                  <div className="text-right">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                      l.plano === 'pro' ? 'bg-violet-100 text-violet-700' :
-                      'bg-gray-100 text-gray-600'
-                    }`}>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{
+                      fontSize: '11px', padding: '2px 8px',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      color: l.plano === 'pro' ? '#7c3aed' : '#6b6560', fontWeight: 400,
+                    }}>
                       {l.plano}
                     </span>
-                    <p className="text-xs text-gray-400 mt-0.5">{fmtData(l.criado_em)}</p>
+                    <p style={{ fontSize: '11px', color: '#4a4440', marginTop: '2px', fontWeight: 300 }}>{fmtData(l.criado_em)}</p>
                   </div>
                 </div>
               ))}

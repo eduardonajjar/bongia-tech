@@ -9,47 +9,70 @@ const NAV = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <aside className="w-64 bg-gray-900 flex flex-col shrink-0">
-        <div className="p-6 border-b border-gray-700">
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl font-bold text-white">
-              Bongia<span className="text-violet-400">Tech</span>
+    <div style={{ display: 'flex', height: '100vh', background: '#0c0b0a' }}>
+      <aside style={{
+        width: '240px', flexShrink: 0,
+        background: '#111010',
+        borderRight: '1px solid rgba(255,255,255,0.07)',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <h1 style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: '1.125rem', color: '#f5f3f0', fontWeight: 400 }}>
+              BongiaTech
             </h1>
-            <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+            <span style={{
+              background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#f87171', fontSize: '10px', fontWeight: 600,
+              padding: '2px 6px', letterSpacing: '0.06em',
+            }}>
               ADMIN
             </span>
           </div>
-          <p className="text-gray-500 text-xs">Painel do dono</p>
+          <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>Painel do dono</p>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav style={{ flex: 1, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {NAV.map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.625rem',
+                padding: '6px 10px',
+                fontSize: '13px', color: '#6b6560', textDecoration: 'none',
+                fontWeight: 300,
+              }}
+              className="admin-nav-link"
             >
-              <Icon className="w-4 h-4" />
+              <Icon style={{ width: '15px', height: '15px', flexShrink: 0 }} />
               {label}
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-700">
+        <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              fontSize: '13px', color: '#4a4440', textDecoration: 'none', fontWeight: 300,
+            }}
+            className="admin-nav-link"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft style={{ width: '14px', height: '14px' }} />
             Voltar para loja
           </Link>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
+      <main style={{ flex: 1, overflowY: 'auto', background: '#0c0b0a' }}>
         {children}
       </main>
+
+      <style>{`
+        .admin-nav-link:hover { color: #f5f3f0 !important; }
+      `}</style>
     </div>
   )
 }

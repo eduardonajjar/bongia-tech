@@ -25,6 +25,12 @@ interface Pagamento {
   afiliados_pagos: number; status: string; criado_em: string
 }
 
+const inputStyle: React.CSSProperties = {
+  width: '100%', background: 'transparent',
+  border: '1px solid rgba(255,255,255,0.1)', color: '#f5f3f0',
+  padding: '8px 12px', fontSize: '13px', outline: 'none',
+}
+
 export default function LojistDetalhe() {
   const params = useParams()
   const router = useRouter()
@@ -65,80 +71,97 @@ export default function LojistDetalhe() {
   }
 
   if (loading) {
-    return <div className="p-8 text-gray-400">Carregando...</div>
+    return <div style={{ padding: '2rem', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Carregando...</div>
   }
 
   if (!lojista) {
-    return <div className="p-8 text-gray-400">Lojista não encontrado</div>
+    return <div style={{ padding: '2rem', color: '#6b6560', fontSize: '13px', fontWeight: 300 }}>Lojista não encontrado</div>
   }
 
   const emTrial = lojista.trial_ate && new Date(lojista.trial_ate) > new Date()
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div style={{ padding: '2rem', maxWidth: '960px', margin: '0 auto' }}>
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 mb-6 transition-colors"
+        style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          fontSize: '13px', color: '#6b6560', background: 'none', border: 'none',
+          cursor: 'pointer', marginBottom: '1.5rem', fontWeight: 300,
+        }}
+        className="back-btn"
       >
-        <ArrowLeft className="w-4 h-4" /> Voltar
+        <ArrowLeft style={{ width: '14px', height: '14px' }} /> Voltar
       </button>
 
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '2rem' }}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{lojista.nome}</h1>
-          <p className="text-gray-500 text-sm mt-0.5">{lojista.email}</p>
-          <div className="flex gap-2 mt-2">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              lojista.plano === 'pro' ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-600'
-            }`}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>{lojista.nome}</h1>
+          <p style={{ color: '#6b6560', fontSize: '13px', marginTop: '4px', fontWeight: 300 }}>{lojista.email}</p>
+          <div style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
+            <span style={{
+              fontSize: '11px', padding: '2px 8px',
+              border: '1px solid rgba(255,255,255,0.07)',
+              color: lojista.plano === 'pro' ? '#7c3aed' : '#6b6560', fontWeight: 400,
+            }}>
               {lojista.plano}
             </span>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-              !lojista.ativo ? 'bg-red-100 text-red-700' :
-              emTrial ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'
-            }`}>
+            <span style={{
+              fontSize: '11px', padding: '2px 8px',
+              border: '1px solid rgba(255,255,255,0.07)',
+              color: !lojista.ativo ? '#f87171' : emTrial ? '#d97706' : '#4ade80', fontWeight: 400,
+            }}>
               {!lojista.ativo ? 'Inativo' : emTrial ? 'Em trial' : 'Ativo'}
             </span>
             {lojista.nuvemshop_store_id && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium">
+              <span style={{
+                fontSize: '11px', padding: '2px 8px',
+                border: '1px solid rgba(255,255,255,0.07)',
+                color: '#6b6560', fontWeight: 400,
+              }}>
                 Nuvemshop conectada
               </span>
             )}
           </div>
         </div>
-        <p className="text-xs text-gray-400">Cadastrado em {fmtData(lojista.criado_em)}</p>
+        <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>Cadastrado em {fmtData(lojista.criado_em)}</p>
       </div>
 
       {/* Métricas */}
       {metricas && (
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '1px', background: 'rgba(255,255,255,0.07)',
+          border: '1px solid rgba(255,255,255,0.07)',
+          marginBottom: '2rem',
+        }}>
           {[
             { label: 'Afiliados', value: metricas.totalAfiliados },
             { label: 'Vendas rastreadas', value: metricas.totalVendas },
             { label: 'Comissões geradas', value: fmt(metricas.volumeTotal) },
             { label: 'Taxa p/ plataforma', value: fmt(metricas.taxaTotal) },
           ].map((m) => (
-            <div key={m.label} className="bg-white rounded-xl border border-gray-200 p-5">
-              <p className="text-xs text-gray-500 mb-1">{m.label}</p>
-              <p className="text-xl font-bold text-gray-900">{m.value}</p>
+            <div key={m.label} style={{ background: '#111010', padding: '1.5rem' }}>
+              <p style={{ fontSize: '11px', color: '#4a4440', marginBottom: '6px', fontWeight: 300 }}>{m.label}</p>
+              <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#f5f3f0' }}>{m.value}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Controles manuais */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="font-semibold text-gray-900 mb-6">Controles manuais</h2>
-        <div className="grid grid-cols-3 gap-6">
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem', marginBottom: '1.5rem' }}>
+        <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1.5rem' }}>Controles manuais</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
 
           {/* Mudar plano */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Plano</label>
+            <label style={{ display: 'block', fontSize: '12px', color: '#6b6560', marginBottom: '8px', fontWeight: 400 }}>Plano</label>
             <select
               value={novoPlano}
               onChange={(e) => setNovoPlano(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 mb-3"
+              style={{ ...inputStyle, marginBottom: '12px' }}
             >
               <option value="starter">Starter</option>
               <option value="pro">Pro</option>
@@ -146,36 +169,46 @@ export default function LojistDetalhe() {
             <button
               onClick={() => salvar('plano', { plano: novoPlano })}
               disabled={salvando === 'plano' || novoPlano === lojista.plano}
-              className="flex items-center gap-1 text-sm bg-violet-600 text-white px-4 py-2 rounded-lg hover:bg-violet-700 disabled:opacity-50 transition-colors w-full justify-center"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center',
+                width: '100%', fontSize: '13px', background: '#7c3aed', color: '#fff',
+                padding: '8px', border: 'none', cursor: 'pointer', fontWeight: 500,
+                opacity: (salvando === 'plano' || novoPlano === lojista.plano) ? 0.5 : 1,
+              }}
             >
-              <Save className="w-3.5 h-3.5" />
+              <Save style={{ width: '12px', height: '12px' }} />
               {salvando === 'plano' ? 'Salvando...' : 'Salvar plano'}
             </button>
           </div>
 
           {/* Estender trial */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Trial até</label>
+            <label style={{ display: 'block', fontSize: '12px', color: '#6b6560', marginBottom: '8px', fontWeight: 400 }}>Trial até</label>
             <input
               type="date"
               value={novoTrial}
               onChange={(e) => setNovoTrial(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 mb-3"
+              style={{ ...inputStyle, marginBottom: '12px' }}
             />
             <button
               onClick={() => salvar('trial', { trial_ate: new Date(novoTrial).toISOString() })}
               disabled={salvando === 'trial' || !novoTrial}
-              className="flex items-center gap-1 text-sm bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 disabled:opacity-50 transition-colors w-full justify-center"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center',
+                width: '100%', fontSize: '13px', background: '#d97706', color: '#fff',
+                padding: '8px', border: 'none', cursor: 'pointer', fontWeight: 500,
+                opacity: (salvando === 'trial' || !novoTrial) ? 0.5 : 1,
+              }}
             >
-              <Save className="w-3.5 h-3.5" />
+              <Save style={{ width: '12px', height: '12px' }} />
               {salvando === 'trial' ? 'Salvando...' : 'Estender trial'}
             </button>
           </div>
 
           {/* Desativar conta */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Conta</label>
-            <p className="text-xs text-gray-400 mb-3">
+            <label style={{ display: 'block', fontSize: '12px', color: '#6b6560', marginBottom: '8px', fontWeight: 400 }}>Conta</label>
+            <p style={{ fontSize: '11px', color: '#4a4440', marginBottom: '12px', fontWeight: 300 }}>
               {lojista.ativo
                 ? 'Desativar bloqueia o acesso ao dashboard.'
                 : 'Conta está desativada.'}
@@ -184,25 +217,38 @@ export default function LojistDetalhe() {
               <button
                 onClick={() => setConfirmarDesativar(true)}
                 disabled={!lojista.ativo}
-                className="flex items-center gap-1 text-sm bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg hover:bg-red-100 disabled:opacity-40 transition-colors w-full justify-center"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'center',
+                  width: '100%', fontSize: '13px',
+                  background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                  color: '#f87171', padding: '8px', cursor: 'pointer', fontWeight: 400,
+                  opacity: !lojista.ativo ? 0.4 : 1,
+                }}
               >
-                <AlertTriangle className="w-3.5 h-3.5" />
+                <AlertTriangle style={{ width: '12px', height: '12px' }} />
                 Desativar conta
               </button>
             ) : (
-              <div className="space-y-2">
-                <p className="text-xs text-red-600 font-medium">Tem certeza?</p>
-                <div className="flex gap-2">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <p style={{ fontSize: '12px', color: '#f87171', fontWeight: 500 }}>Tem certeza?</p>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <button
                     onClick={() => salvar('desativar', { ativo: false })}
                     disabled={salvando === 'desativar'}
-                    className="flex-1 text-xs bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 transition-colors"
+                    style={{
+                      flex: 1, fontSize: '12px', background: '#ef4444', color: '#fff',
+                      padding: '6px', border: 'none', cursor: 'pointer', fontWeight: 500,
+                    }}
                   >
                     Sim, desativar
                   </button>
                   <button
                     onClick={() => setConfirmarDesativar(false)}
-                    className="flex-1 text-xs border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                    style={{
+                      flex: 1, fontSize: '12px', background: 'transparent',
+                      border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
+                      padding: '6px', cursor: 'pointer', fontWeight: 300,
+                    }}
                   >
                     Cancelar
                   </button>
@@ -214,34 +260,39 @@ export default function LojistDetalhe() {
       </div>
 
       {/* Pagamentos */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-900 mb-4">Últimos pagamentos processados</h2>
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
+        <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1rem' }}>Últimos pagamentos processados</h2>
         {pagamentos.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6">Nenhum pagamento ainda</p>
+          <p style={{ fontSize: '13px', color: '#6b6560', textAlign: 'center', padding: '1.5rem 0', fontWeight: 300 }}>Nenhum pagamento ainda</p>
         ) : (
-          <table className="w-full text-sm">
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
             <thead>
-              <tr className="border-b border-gray-100">
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Data</th>
-                <th className="text-right py-2 text-xs font-semibold text-gray-500 uppercase">Total pago</th>
-                <th className="text-right py-2 text-xs font-semibold text-gray-500 uppercase">Afiliados</th>
-                <th className="text-right py-2 text-xs font-semibold text-gray-500 uppercase">Taxa</th>
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Status</th>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                {['Data', 'Total pago', 'Afiliados', 'Taxa', 'Status'].map((h) => (
+                  <th key={h} style={{
+                    padding: '8px 0', textAlign: h === 'Total pago' || h === 'Afiliados' || h === 'Taxa' ? 'right' : 'left',
+                    fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                  }}>
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {pagamentos.map((p) => (
-                <tr key={p.id} className="border-b border-gray-50">
-                  <td className="py-2.5 text-gray-500">{fmtData(p.criado_em)}</td>
-                  <td className="py-2.5 text-right font-medium text-gray-900">{fmt(p.total_pago)}</td>
-                  <td className="py-2.5 text-right text-gray-600">{p.afiliados_pagos}</td>
-                  <td className="py-2.5 text-right text-green-700 font-medium">{fmt(p.taxa_plataforma)}</td>
-                  <td className="py-2.5">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                      p.status === 'concluido' ? 'bg-green-100 text-green-700' :
-                      p.status === 'erro' ? 'bg-red-100 text-red-700' :
-                      'bg-amber-100 text-amber-700'
-                    }`}>
+                <tr key={p.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <td style={{ padding: '10px 0', color: '#6b6560', fontWeight: 300 }}>{fmtData(p.criado_em)}</td>
+                  <td style={{ padding: '10px 0', textAlign: 'right', fontWeight: 500, color: '#f5f3f0' }}>{fmt(p.total_pago)}</td>
+                  <td style={{ padding: '10px 0', textAlign: 'right', color: '#6b6560', fontWeight: 300 }}>{p.afiliados_pagos}</td>
+                  <td style={{ padding: '10px 0', textAlign: 'right', fontWeight: 400, color: '#f5f3f0' }}>{fmt(p.taxa_plataforma)}</td>
+                  <td style={{ padding: '10px 0' }}>
+                    <span style={{
+                      fontSize: '11px', padding: '2px 8px',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      color: p.status === 'concluido' ? '#4ade80' : p.status === 'erro' ? '#f87171' : '#d97706',
+                      fontWeight: 400,
+                    }}>
                       {p.status}
                     </span>
                   </td>
@@ -251,6 +302,10 @@ export default function LojistDetalhe() {
           </table>
         )}
       </div>
+
+      <style>{`
+        .back-btn:hover { color: #f5f3f0 !important; }
+      `}</style>
     </div>
   )
 }

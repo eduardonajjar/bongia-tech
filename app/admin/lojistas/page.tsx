@@ -61,103 +61,122 @@ export default function AdminLojistasPage() {
   const totalPages = Math.ceil(total / perPage)
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Lojistas</h1>
-        <p className="text-gray-500 text-sm mt-1">{total} lojistas encontrados</p>
+    <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h1 style={{ fontSize: '1.25rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)' }}>Lojistas</h1>
+        <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>{total} lojistas encontrados</p>
       </div>
 
       {/* Filtros + busca */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-2">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', gap: '4px' }}>
           {FILTROS.map((f) => (
             <button
               key={f.key}
               onClick={() => handleFiltro(f.key)}
-              className={`text-sm px-3 py-1.5 rounded-lg font-medium transition-colors ${
-                filtro === f.key
-                  ? 'bg-violet-600 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
+              style={{
+                fontSize: '12px', padding: '4px 12px', fontWeight: 300, cursor: 'pointer',
+                background: filtro === f.key ? '#f5f3f0' : 'transparent',
+                border: '1px solid rgba(255,255,255,0.07)',
+                color: filtro === f.key ? '#0c0b0a' : '#6b6560',
+              }}
             >
               {f.label}
             </button>
           ))}
         </div>
-        <form onSubmit={handleBusca} className="flex gap-2">
-          <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <form onSubmit={handleBusca} style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ position: 'relative' }}>
+            <Search style={{ width: '14px', height: '14px', position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#6b6560' }} />
             <input
               value={buscaInput}
               onChange={(e) => setBuscaInput(e.target.value)}
               placeholder="Nome ou email..."
-              className="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 w-56"
+              style={{
+                paddingLeft: '32px', paddingRight: '1rem', paddingTop: '8px', paddingBottom: '8px',
+                fontSize: '13px', background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.1)', color: '#f5f3f0', outline: 'none',
+                width: '224px',
+              }}
             />
           </div>
-          <button type="submit" className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+          <button
+            type="submit"
+            style={{
+              fontSize: '13px', background: '#f5f3f0', color: '#0c0b0a',
+              padding: '8px 16px', border: 'none', cursor: 'pointer', fontWeight: 500,
+            }}
+          >
             Buscar
           </button>
         </form>
       </div>
 
       {/* Tabela */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table className="w-full text-sm">
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
-            <tr className="border-b border-gray-100 bg-gray-50">
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Lojista</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Plano</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-              <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Afiliados</th>
-              <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Volume</th>
-              <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Taxa</th>
-              <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Cadastro</th>
-              <th className="px-4 py-3"></th>
+            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
+              {['Lojista', 'Plano', 'Status', 'Afiliados', 'Volume', 'Taxa', 'Cadastro', ''].map((h) => (
+                <th key={h} style={{
+                  padding: '10px 16px', textAlign: h === 'Afiliados' || h === 'Volume' || h === 'Taxa' ? 'right' : 'left',
+                  fontSize: '10px', fontWeight: 400, color: '#4a4440',
+                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                }}>
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">Carregando...</td>
+                <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#6b6560', fontWeight: 300 }}>Carregando...</td>
               </tr>
             ) : lojistas.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">Nenhum lojista encontrado</td>
+                <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#6b6560', fontWeight: 300 }}>Nenhum lojista encontrado</td>
               </tr>
             ) : (
               lojistas.map((l) => {
                 const emTrial = l.trial_ate && new Date(l.trial_ate) > agora
                 const status = !l.ativo ? 'Inativo' : emTrial ? 'Trial' : 'Ativo'
-                const statusCor = !l.ativo ? 'bg-red-100 text-red-700' :
-                  emTrial ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'
+                const statusColor = !l.ativo ? '#f87171' : emTrial ? '#d97706' : '#4ade80'
                 return (
                   <tr
                     key={l.id}
                     onClick={() => router.push(`/admin/lojistas/${l.id}`)}
-                    className="border-b border-gray-50 hover:bg-violet-50 cursor-pointer transition-colors"
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}
+                    className="admin-row"
                   >
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900">{l.nome}</p>
-                      <p className="text-xs text-gray-400">{l.email}</p>
+                    <td style={{ padding: '12px 16px' }}>
+                      <p style={{ fontWeight: 400, color: '#f5f3f0' }}>{l.nome}</p>
+                      <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>{l.email}</p>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        l.plano === 'pro' ? 'bg-violet-100 text-violet-700' : 'bg-gray-100 text-gray-600'
-                      }`}>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{
+                        fontSize: '11px', padding: '2px 8px',
+                        border: '1px solid rgba(255,255,255,0.07)',
+                        color: l.plano === 'pro' ? '#7c3aed' : '#6b6560', fontWeight: 400,
+                      }}>
                         {l.plano}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusCor}`}>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{
+                        fontSize: '11px', padding: '2px 8px',
+                        border: '1px solid rgba(255,255,255,0.07)',
+                        color: statusColor, fontWeight: 400,
+                      }}>
                         {status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-700">{l.afiliados}</td>
-                    <td className="px-4 py-3 text-right text-gray-700">{fmt(l.volume)}</td>
-                    <td className="px-4 py-3 text-right font-medium text-green-700">{fmt(l.taxa)}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{fmtData(l.criado_em)}</td>
-                    <td className="px-4 py-3">
-                      <ChevronRight className="w-4 h-4 text-gray-300" />
+                    <td style={{ padding: '12px 16px', textAlign: 'right', color: '#6b6560', fontWeight: 300 }}>{l.afiliados}</td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', color: '#6b6560', fontWeight: 300 }}>{fmt(l.volume)}</td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 500, color: '#f5f3f0' }}>{fmt(l.taxa)}</td>
+                    <td style={{ padding: '12px 16px', color: '#4a4440', fontSize: '11px', fontWeight: 300 }}>{fmtData(l.criado_em)}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <ChevronRight style={{ width: '14px', height: '14px', color: '#4a4440' }} />
                     </td>
                   </tr>
                 )
@@ -168,29 +187,48 @@ export default function AdminLojistasPage() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-            <p className="text-xs text-gray-400">
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.07)',
+          }}>
+            <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>
               Página {page} de {totalPages} · {total} lojistas
             </p>
-            <div className="flex gap-2">
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  fontSize: '12px', padding: '6px 12px',
+                  background: 'transparent', border: '1px solid rgba(255,255,255,0.07)',
+                  color: '#6b6560', cursor: 'pointer', fontWeight: 300,
+                  opacity: page === 1 ? 0.4 : 1,
+                }}
               >
-                <ChevronLeft className="w-3 h-3" /> Anterior
+                <ChevronLeft style={{ width: '12px', height: '12px' }} /> Anterior
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-200 rounded-lg disabled:opacity-40 hover:bg-gray-50 transition-colors"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '4px',
+                  fontSize: '12px', padding: '6px 12px',
+                  background: 'transparent', border: '1px solid rgba(255,255,255,0.07)',
+                  color: '#6b6560', cursor: 'pointer', fontWeight: 300,
+                  opacity: page === totalPages ? 0.4 : 1,
+                }}
               >
-                Próxima <ChevronRight className="w-3 h-3" />
+                Próxima <ChevronRight style={{ width: '12px', height: '12px' }} />
               </button>
             </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        .admin-row:hover { background: rgba(255,255,255,0.02) !important; }
+      `}</style>
     </div>
   )
 }
