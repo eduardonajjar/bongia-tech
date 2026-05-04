@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     const admin = createAdminClient()
     const service = await createServiceClient()
 
-    // 3. Verificar se lojista já existe pelo email
+    // 3. Verificar se usuário já existe (em lojistas ou em auth.users)
     const { data: lojistExistente } = await service
       .from('lojistas')
       .select('id')
@@ -49,21 +49,37 @@ export async function GET(req: NextRequest) {
     let userId: string
 
     if (lojistExistente) {
-      // Lojista já existe — só loga
+      // Lojista já existe na tabela — só loga
       userId = lojistExistente.id
     } else {
-      // Primeiro acesso — criar conta Supabase (o trigger handle_new_user cria o registro em lojistas)
-      const { data: novoUser, error: erroCriacao } = await admin.auth.admin.createUser({
-        email,
-        email_confirm: true,
-        user_metadata: { nome },
-      })
+      // Checar se já existe em auth.users (evita duplicata)
+      const { data: authList } = await admin.auth.admin.listUsers()
+      const authExistente = authList?.users?.find((u) => u.email === email)
 
-      if (erroCriacao || !novoUser.user) {
-        throw new Error(`Erro ao criar usuário: ${erroCriacao?.message}`)
+      if (authExistente) {
+        // Usuário existe em auth mas não tem registro em lojistas — criar o registro
+        userId = authExistente.id
+        await service.from('lojistas').upsert({
+          id: userId,
+          email,
+          nome,
+          plano: 'starter',
+          ativo: true,
+        }, { onConflict: 'id' })
+      } else {
+        // Primeiro acesso — criar conta Supabase (trigger handle_new_user cria registro em lojistas)
+        const { data: novoUser, error: erroCriacao } = await admin.auth.admin.createUser({
+          email,
+          email_confirm: true,
+          user_metadata: { nome },
+        })
+
+        if (erroCriacao || !novoUser.user) {
+          throw new Error(`Erro ao criar usuário: ${erroCriacao?.message}`)
+        }
+
+        userId = novoUser.user.id
       }
-
-      userId = novoUser.user.id
     }
 
     // 4. Salvar token Nuvemshop + store_id no lojista
