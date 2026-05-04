@@ -76,17 +76,18 @@ export async function trocarCodigoPorToken(
   clientSecret: string,
   code: string
 ): Promise<{ access_token: string; user_id: string }> {
-  const params = new URLSearchParams({
-    client_id: String(Number(clientId)),
+  const payload = {
+    client_id: Number(clientId),
     client_secret: clientSecret,
     grant_type: 'authorization_code',
     code,
-  })
+  }
+  console.log('[trocarToken] enviando: client_id=', payload.client_id, 'secret_len=', clientSecret.length, 'secret_prefix=', clientSecret.slice(0, 8))
 
   const res = await fetch('https://www.nuvemshop.com.br/apps/authorize/token', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params.toString(),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
   })
 
   const raw = await res.text()
