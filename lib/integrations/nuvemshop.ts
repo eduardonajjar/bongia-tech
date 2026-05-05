@@ -54,15 +54,17 @@ export async function registrarWebhook(token: string, storeId: string, callbackU
 }
 
 export async function registrarScriptTag(token: string, storeId: string, scriptUrl: string) {
-  // Busca script tags existentes para evitar duplicata
+  // Busca scripts existentes para evitar duplicata
   const existing = await nuvemshopRequest<Array<{ id: number; src: string }>>(
-    token, storeId, 'GET', '/script_tags'
+    token, storeId, 'GET', '/scripts'
   ).catch(() => [] as Array<{ id: number; src: string }>)
 
   const jaExiste = existing.some((s) => s.src === scriptUrl)
   if (jaExiste) return
 
-  return nuvemshopRequest(token, storeId, 'POST', '/script_tags', {
+  // where: 'storefront' — roda em todas as páginas (requer aprovação em api@nuvemshop.com.br)
+  // where: 'checkout'   — roda só no checkout (sem aprovação)
+  return nuvemshopRequest(token, storeId, 'POST', '/scripts', {
     src: scriptUrl,
     where: 'storefront',
     event: 'onload',
