@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { CheckCircle, AlertCircle, ExternalLink, Loader2, Link2 } from 'lucide-react'
 
-const NUVEMSHOP_CLIENT_ID = process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || ''
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const NUVEMSHOP_CLIENT_ID = (process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || '').replace(/[﻿]/g, '').trim()
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/[﻿]/g, '').trim()
 
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'transparent',

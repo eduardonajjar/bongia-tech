@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { LayoutDashboard, Users, ShoppingCart, CreditCard, Settings, Link2 } from 'lucide-react'
@@ -28,9 +29,11 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single()
 
-  // Redireciona lojista novo para onboarding
-  // O próprio /dashboard/onboarding não usa este layout, então não há loop
-  if (lojista && !lojista.onboarding_concluido) {
+  // Redireciona lojista novo para onboarding (exceto se já está no onboarding)
+  const headersList = await headers()
+  const currentPath = headersList.get('x-pathname') || ''
+
+  if (lojista && !lojista.onboarding_concluido && !currentPath.includes('/onboarding')) {
     redirect('/dashboard/onboarding')
   }
 

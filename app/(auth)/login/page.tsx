@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
 
-const NUVEMSHOP_CLIENT_ID = process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || ''
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || ''
+const NUVEMSHOP_CLIENT_ID = (process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || '').replace(/[﻿]/g, '').trim()
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/[﻿]/g, '').trim()
 
 function nuvemshopOAuthUrl() {
   const redirect = `${APP_URL}/api/nuvemshop/callback`
@@ -21,6 +21,42 @@ export default function LoginPage() {
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
   const [modoEmail, setModoEmail] = useState(false)
+
+  // Detecta tokens no hash fragment (magic link do OAuth) e cria sessão
+  useEffect(() => {
+    const run = async () => {
+      const hash = window.location.hash
+      if (hash) {
+        const params = new URLSearchParams(hash.replace(/^#/, ''))
+        const access_token = params.get('access_token')
+        const refresh_token = params.get('refresh_token')
+        const type = params.get('type')
+
+        if (type === 'magiclink' && access_token && refresh_token) {
+          const supabase = createClient()
+          const { error } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+          })
+          if (!error) {
+            // Limpa o hash da URL e redireciona
+            window.history.replaceState({}, document.title, '/login')
+            router.replace('/dashboard')
+            return
+          }
+          console.error('[login] erro ao setar sessão:', error.message)
+        }
+      }
+
+      // Verifica se já está logado (sem hash)
+      const supabase = createClient()
+      const { data } = await supabase.auth.getSession()
+      if (data.session) {
+        router.replace('/dashboard')
+      }
+    }
+    run()
+  }, [router])
 
   // Lê erro vindo do callback OAuth
   const erroParam = typeof window !== 'undefined'

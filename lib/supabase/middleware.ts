@@ -4,9 +4,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  const stripBOM = (s: string) => (s || '').replace(/[﻿]/g, '').trim()
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    stripBOM(process.env.NEXT_PUBLIC_SUPABASE_URL || ''),
+    stripBOM(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''),
     {
       cookies: {
         getAll() {
@@ -45,5 +46,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Adiciona pathname como header para server components lerem
+  supabaseResponse.headers.set('x-pathname', pathname)
   return supabaseResponse
 }

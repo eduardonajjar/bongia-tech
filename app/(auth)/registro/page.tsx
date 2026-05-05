@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ExternalLink } from 'lucide-react'
 
-const NUVEMSHOP_CLIENT_ID = process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || ''
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || ''
+const NUVEMSHOP_CLIENT_ID = (process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || '').replace(/[﻿]/g, '').trim()
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/[﻿]/g, '').trim()
 
 function nuvemshopOAuthUrl() {
   const redirect = `${APP_URL}/api/nuvemshop/callback`

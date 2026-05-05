@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createServiceClient } from '@/lib/supabase/server'
-import { trocarCodigoPorToken, obterLoja, registrarWebhook, extrairNomeLoja } from '@/lib/integrations/nuvemshop'
+import { trocarCodigoPorToken, obterLoja, registrarWebhook, registrarScriptTag, extrairNomeLoja } from '@/lib/integrations/nuvemshop'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/[﻿]/g, '').trim()
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code')
@@ -85,14 +85,16 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 4. Salvar token Nuvemshop + store_id no lojista
+    // 4. Salvar token Nuvemshop + store_id + store_url no lojista
+    const storeUrl = loja.url || null
     await service
       .from('lojistas')
       .update({
         nuvemshop_token: access_token,
         nuvemshop_store_id: user_id,
-        nome, // atualiza nome com o nome real da loja
-      })
+        nuvemshop_store_url: storeUrl,
+        nome,
+      } as any)
       .eq('id', userId)
 
     // 5. Registrar webhook para order/paid (ignora erro se já existe)
@@ -102,22 +104,33 @@ export async function GET(req: NextRequest) {
       `${APP_URL}/api/webhooks/nuvemshop`
     ).catch(() => {})
 
+    // 5b. Registrar script tag do tracker em todas as páginas da loja
+    await registrarScriptTag(
+      access_token,
+      user_id,
+      `${APP_URL}/tracker.js`
+    ).catch(() => {})
+
     console.log('[callback] step 6: gerando magic link para', email)
-    // 6. Gerar magic link server-side — redireciona o lojista para dentro do dashboard sem senha
+    // 6. Gerar magic link server-side
     const { data: linkData, error: erroLink } = await admin.auth.admin.generateLink({
       type: 'magiclink',
       email,
-      options: {
-        redirectTo: `${APP_URL}/dashboard`,
-      },
     })
 
-    if (erroLink || !linkData?.properties?.action_link) {
+    if (erroLink || !linkData?.properties?.hashed_token) {
       throw new Error(`Erro ao gerar link de acesso: ${erroLink?.message}`)
     }
 
-    // 7. Redirecionar para Supabase → cria sessão → cai no /dashboard
-    return NextResponse.redirect(linkData.properties.action_link)
+    // 7. Redirecionar para /auth/callback que faz verifyOtp server-side (seta cookies)
+    // Isso evita o problema do hash fragment que o servidor não enxerga
+    const authCallbackUrl = new URL('/auth/callback', APP_URL)
+    authCallbackUrl.searchParams.set('token_hash', linkData.properties.hashed_token)
+    authCallbackUrl.searchParams.set('type', 'magiclink')
+    authCallbackUrl.searchParams.set('next', '/dashboard')
+
+    console.log('[callback] redirecionando para auth/callback com token_hash')
+    return NextResponse.redirect(authCallbackUrl.toString())
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('[nuvemshop/callback] erro:', msg)

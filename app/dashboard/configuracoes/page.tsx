@@ -118,25 +118,17 @@ export default function ConfiguracoesPage() {
         {/* Plano */}
         <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', padding: '1.5rem' }}>
           <h3 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0', marginBottom: '1rem' }}>Plano atual</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            {[
-              { id: 'starter', label: 'Starter', preco: 'R$149/mês', limite: 'Até 50 afiliados' },
-              { id: 'pro', label: 'Pro', preco: 'R$349/mês', limite: 'Afiliados ilimitados' },
-            ].map((plano) => (
-              <div
-                key={plano.id}
-                style={{
-                  border: '1px solid rgba(124,58,237,0.3)',
-                  background: 'rgba(124,58,237,0.06)',
-                  padding: '1rem',
-                }}
-              >
-                <p style={{ fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>{plano.label}</p>
-                <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#7c3aed', marginTop: '4px' }}>{plano.preco}</p>
-                <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '4px', fontWeight: 300 }}>{plano.limite}</p>
-                <p style={{ fontSize: '11px', color: '#4a4440', marginTop: '6px', fontWeight: 300 }}>+ 3% sobre comissões pagas</p>
-              </div>
-            ))}
+          <div
+            style={{
+              border: '1px solid rgba(124,58,237,0.3)',
+              background: 'rgba(124,58,237,0.06)',
+              padding: '1rem',
+              maxWidth: '280px',
+            }}
+          >
+            <p style={{ fontSize: '13px', fontWeight: 500, color: '#f5f3f0' }}>Starter</p>
+            <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#7c3aed', marginTop: '4px' }}>R$149/mês</p>
+            <p style={{ fontSize: '12px', color: '#6b6560', marginTop: '4px', fontWeight: 300 }}>Até 50 afiliados</p>
           </div>
           <p style={{ fontSize: '11px', color: '#4a4440', marginTop: '1rem', fontWeight: 300 }}>
             Para alterar seu plano, entre em contato: suporte@bongiatech.com.br

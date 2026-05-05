@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Check, Copy, ChevronRight, AlertTriangle, Link2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-const NUVEMSHOP_CLIENT_ID = process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || ''
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/[﻿]/g, '').trim()
+const NUVEMSHOP_CLIENT_ID = (process.env.NEXT_PUBLIC_NUVEMSHOP_CLIENT_ID || '').replace(/[﻿]/g, '').trim()
 
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'transparent',
@@ -24,10 +24,30 @@ export default function OnboardingPage() {
   const [afiliado, setAfiliado] = useState<{ nome: string; ref_code: string; token: string } | null>(null)
   const [copiado, setCopiado] = useState(false)
   const [confete, setConfete] = useState(false)
+  const [lojaConectada, setLojaConectada] = useState(false)
 
   const [form, setForm] = useState({ nome: '', email: '', comissao: '10', chave_pix: '', tipo_pix: 'cpf' })
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
+
+  // Verifica se a loja Nuvemshop já está conectada (veio pelo OAuth)
+  useState(() => {
+    const checkLoja = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data } = await supabase
+          .from('lojistas')
+          .select('nuvemshop_store_id')
+          .eq('id', user.id)
+          .single()
+        if (data?.nuvemshop_store_id) {
+          setLojaConectada(true)
+        }
+      }
+    }
+    checkLoja()
+  })
 
   async function adicionarAfiliado(e: React.FormEvent) {
     e.preventDefault()
@@ -88,13 +108,14 @@ export default function OnboardingPage() {
         {confete && (
           <div style={{
             position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 50,
+            background: 'rgba(12,11,10,0.85)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '5rem', marginBottom: '1rem', animation: 'bounce 1s infinite' }}>🎉</div>
               <p style={{ fontFamily: 'var(--serif)', fontSize: '1.5rem', color: '#f5f3f0' }}>Tudo pronto!</p>
               <p style={{ color: '#6b6560', marginTop: '8px', fontSize: '14px', fontWeight: 300 }}>
-                Agora é só mandar o link para {afiliado?.nome} e esperar as vendas chegarem.
+                Agora é só mandar o link para {afiliado?.nome || 'seu afiliado'} e esperar as vendas chegarem.
               </p>
             </div>
           </div>
@@ -290,47 +311,82 @@ export default function OnboardingPage() {
           {/* Passo 3 — Conectar Nuvemshop */}
           {passo === 3 && (
             <div style={{ padding: '2rem' }}>
-              <h2 style={{ fontSize: '1.125rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)', marginBottom: '4px' }}>
-                Conecte sua loja Nuvemshop
-              </h2>
-              <p style={{ color: '#6b6560', fontSize: '13px', marginBottom: '1.5rem', fontWeight: 300 }}>
-                Para as vendas aparecerem automaticamente, precisamos receber os pedidos da sua loja.
-              </p>
+              {lojaConectada ? (
+                <>
+                  <h2 style={{ fontSize: '1.125rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)', marginBottom: '4px' }}>
+                    Loja Nuvemshop conectada
+                  </h2>
+                  <p style={{ color: '#6b6560', fontSize: '13px', marginBottom: '1.5rem', fontWeight: 300 }}>
+                    Sua loja já está integrada. As vendas serão registradas automaticamente quando um afiliado gerar uma compra.
+                  </p>
 
-              <div style={{
-                background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
-                padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '10px',
-              }}>
-                <AlertTriangle style={{ width: '14px', height: '14px', color: '#f87171', flexShrink: 0, marginTop: '2px' }} />
-                <p style={{ fontSize: '13px', color: '#f87171', fontWeight: 300 }}>
-                  <strong>Sem conectar a loja,</strong> as vendas não são registradas automaticamente. Você pode fazer isso agora ou depois em Integrações.
-                </p>
-              </div>
+                  <div style={{
+                    background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)',
+                    padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '10px',
+                  }}>
+                    <Check style={{ width: '14px', height: '14px', color: '#4ade80', flexShrink: 0, marginTop: '2px' }} />
+                    <p style={{ fontSize: '13px', color: '#4ade80', fontWeight: 300 }}>
+                      Integração com Nuvemshop ativa. Webhook de pedidos configurado.
+                    </p>
+                  </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <a
-                  href={`https://www.nuvemshop.com.br/apps/${NUVEMSHOP_CLIENT_ID}/authorize?redirect_uri=${encodeURIComponent(`${APP_URL}/api/nuvemshop/callback`)}`}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                    width: '100%', background: '#7c3aed', color: '#fff',
-                    padding: '12px', textDecoration: 'none',
-                    fontSize: '14px', fontWeight: 500,
-                  }}
-                >
-                  <Link2 style={{ width: '16px', height: '16px' }} />
-                  Conectar loja Nuvemshop agora
-                </a>
-                <button
-                  onClick={concluir}
-                  style={{
-                    width: '100%', background: 'transparent',
-                    border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
-                    padding: '12px', fontSize: '13px', fontWeight: 300, cursor: 'pointer',
-                  }}
-                >
-                  Pular por agora — vou conectar depois
-                </button>
-              </div>
+                  <button
+                    onClick={concluir}
+                    style={{
+                      width: '100%', background: '#f5f3f0', color: '#0c0b0a',
+                      padding: '12px', fontSize: '14px', fontWeight: 500,
+                      border: 'none', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                    }}
+                  >
+                    Concluir e ir para o painel <ChevronRight style={{ width: '16px', height: '16px' }} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h2 style={{ fontSize: '1.125rem', fontWeight: 400, color: '#f5f3f0', fontFamily: 'var(--serif)', marginBottom: '4px' }}>
+                    Conecte sua loja Nuvemshop
+                  </h2>
+                  <p style={{ color: '#6b6560', fontSize: '13px', marginBottom: '1.5rem', fontWeight: 300 }}>
+                    Para as vendas aparecerem automaticamente, precisamos receber os pedidos da sua loja.
+                  </p>
+
+                  <div style={{
+                    background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)',
+                    padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '10px',
+                  }}>
+                    <AlertTriangle style={{ width: '14px', height: '14px', color: '#f87171', flexShrink: 0, marginTop: '2px' }} />
+                    <p style={{ fontSize: '13px', color: '#f87171', fontWeight: 300 }}>
+                      <strong>Sem conectar a loja,</strong> as vendas não são registradas automaticamente. Você pode fazer isso agora ou depois em Integrações.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <a
+                      href={`https://www.nuvemshop.com.br/apps/${NUVEMSHOP_CLIENT_ID}/authorize?redirect_uri=${encodeURIComponent(`${APP_URL}/api/nuvemshop/callback`)}`}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        width: '100%', background: '#7c3aed', color: '#fff',
+                        padding: '12px', textDecoration: 'none',
+                        fontSize: '14px', fontWeight: 500,
+                      }}
+                    >
+                      <Link2 style={{ width: '16px', height: '16px' }} />
+                      Conectar loja Nuvemshop agora
+                    </a>
+                    <button
+                      onClick={concluir}
+                      style={{
+                        width: '100%', background: 'transparent',
+                        border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
+                        padding: '12px', fontSize: '13px', fontWeight: 300, cursor: 'pointer',
+                      }}
+                    >
+                      Pular por agora — vou conectar depois
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

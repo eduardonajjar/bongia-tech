@@ -1,12 +1,23 @@
 const NUVEMSHOP_API = 'https://api.nuvemshop.com.br/v1'
 
+export interface NuvemshopOrderProduct {
+  product_id: number
+  name: string
+  price: string        // preço unitário
+  quantity: number
+}
+
 export interface NuvemshopOrder {
   id: number
   number: number
   status: string
   payment_status: string
-  total: string
+  total: string        // valor total (produtos + frete - descontos)
+  subtotal: string     // valor só dos produtos (sem frete)
+  shipping: string     // valor do frete
+  note: string | null  // nota do pedido — tracker.js injeta bt=SESSION_ID aqui
   customer: { name: string; email: string }
+  products: NuvemshopOrderProduct[]
   created_at: string
 }
 
@@ -39,6 +50,22 @@ export async function registrarWebhook(token: string, storeId: string, callbackU
   return nuvemshopRequest(token, storeId, 'POST', '/webhooks', {
     event: 'order/paid',
     url: callbackUrl,
+  })
+}
+
+export async function registrarScriptTag(token: string, storeId: string, scriptUrl: string) {
+  // Busca script tags existentes para evitar duplicata
+  const existing = await nuvemshopRequest<Array<{ id: number; src: string }>>(
+    token, storeId, 'GET', '/script_tags'
+  ).catch(() => [] as Array<{ id: number; src: string }>)
+
+  const jaExiste = existing.some((s) => s.src === scriptUrl)
+  if (jaExiste) return
+
+  return nuvemshopRequest(token, storeId, 'POST', '/script_tags', {
+    src: scriptUrl,
+    where: 'storefront',
+    event: 'onload',
   })
 }
 

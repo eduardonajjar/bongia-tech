@@ -5,7 +5,7 @@ import { formatCurrency, formatDate } from '@/lib/utils'
 import { UserPlus, Copy, Check, MoreHorizontal } from 'lucide-react'
 import type { Afiliado } from '@/types/afiliado'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/[﻿﻿]/g, '').trim()
 
 const inputStyle: React.CSSProperties = {
   width: '100%', background: 'transparent',
