@@ -28,8 +28,10 @@ export async function GET(req: NextRequest) {
     console.log('[callback] step 2: buscando dados da loja, user_id:', user_id)
     // 2. Buscar dados da loja (email + nome)
     const loja = await obterLoja(access_token, user_id)
-    const email = loja.contact_email || loja.email
-    const nome = extrairNomeLoja(loja.name)
+    const emailBruto = loja.contact_email || loja.email || ''
+    const email = emailBruto.replace(/﻿/g, '').replace(/​/g, '').trim().toLowerCase()
+    const nome = (extrairNomeLoja(loja.name) || '').replace(/﻿/g, '').replace(/​/g, '').trim()
+    console.log('[callback] emailBruto:', JSON.stringify(emailBruto), 'emailLimpo:', JSON.stringify(email))
 
     if (!email) {
       throw new Error('Não foi possível obter o email da loja Nuvemshop')
