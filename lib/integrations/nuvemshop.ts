@@ -62,12 +62,12 @@ export async function registrarScriptTag(token: string, storeId: string, scriptU
   const jaExiste = existing.some((s) => s.src === scriptUrl)
   if (jaExiste) return
 
-  // where: 'storefront' — roda em todas as páginas (requer aprovação em api@nuvemshop.com.br)
-  // where: 'checkout'   — roda só no checkout (sem aprovação)
+  // where: 'storefront' — todas as páginas
+  // event: 'onfirstinteraction' — não precisa de aprovação (diferente de 'onload')
   return nuvemshopRequest(token, storeId, 'POST', '/scripts', {
     src: scriptUrl,
     where: 'storefront',
-    event: 'onload',
+    event: 'onfirstinteraction',
   })
 }
 

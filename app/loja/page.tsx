@@ -26,23 +26,27 @@ export default async function LojaPage({
   const supabase = await createServiceClient()
 
   // Busca o afiliado pelo ref_code
-  const { data: afiliado } = await supabase
+  const { data: afiliado, error: erroAfiliado } = await supabase
     .from('afiliados')
     .select('id, lojista_id')
     .eq('ref_code', ref)
     .eq('ativo', true)
     .single()
 
+  console.log('[loja] ref:', ref, 'afiliado:', afiliado, 'erro:', erroAfiliado?.message)
+
   if (!afiliado) {
     redirect('/')
   }
 
   // Busca dados do lojista para saber a URL da loja
-  const { data: lojista } = await supabase
+  const { data: lojista, error: erroLojista } = await supabase
     .from('lojistas')
     .select('nuvemshop_token, nuvemshop_store_id, nuvemshop_store_url')
     .eq('id', afiliado.lojista_id)
     .single()
+
+  console.log('[loja] lojista store_id:', lojista?.nuvemshop_store_id, 'store_url:', (lojista as any)?.nuvemshop_store_url, 'erro:', erroLojista?.message)
 
   if (!lojista?.nuvemshop_store_id) {
     redirect('/')
