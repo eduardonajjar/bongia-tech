@@ -1,12 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { atribuirVenda } from '@/lib/tracking/attribution'
 import { enviarNotificacaoVenda } from '@/lib/integrations/resend'
 import { obterPedido } from '@/lib/integrations/nuvemshop'
 
-export async function POST(req: NextRequest) {
+const stripBOM = (s: string) => (s || '').replace(/[﻿]/g, '').trim()
+
+/**
+ * Valida a assinatura HMAC-SHA256 da Nuvemshop.
+ * O secret usado é o CLIENT_SECRET global do app (não o access_token do lojista).
+ * Header: x-linkedstore-hmac-sha256
+ */
+async function validarHMAC(req: NextRequest, rawBody: string): Promise<boolean> {
+  const secret = stripBOM(process.env.NUVEMSHOP_CLIENT_SECRET || '')
+  if (!secret) return true // Se não tiver secret configurado, pula a validação (dev)
+
+  const hmacHeader = req.headers.get('x-linkedstore-hmac-sha256') || ''
+  if (!hmacHeader) {
+    console.warn('[webhook] header HMAC ausente')
+    return false
+  }
+
+  const hmacCalculado = createHmac('sha256', secret)
+    .update(rawBody, 'utf8')
+    .digest('hex')
+
   try {
-    const body = await req.json()
+    return timingSafeEqual(
+      Buffer.from(hmacCalculado, 'hex'),
+      Buffer.from(hmacHeader, 'hex')
+    )
+  } catch {
+    return false
+  }
+}
+
+export async function POST(req: NextRequest) {
+  // ─── 1. Ler raw body ANTES de qualquer parse ─────────────────────────────
+  const rawBody = await req.text()
+
+  // ─── 2. Validar HMAC ─────────────────────────────────────────────────────
+  const hmacValido = await validarHMAC(req, rawBody)
+  if (!hmacValido) {
+    console.warn('[webhook] HMAC inválido — requisição rejeitada')
+    return NextResponse.json({ ok: false, erro: 'Assinatura inválida' }, { status: 401 })
+  }
+
+  try {
+    const body = JSON.parse(rawBody)
 
     if (body.event !== 'order/paid') {
       return NextResponse.json({ ok: true })
@@ -46,17 +88,14 @@ export async function POST(req: NextRequest) {
         }, 0)
       }
 
-      // Fallback: subtotal do pedido se disponível (Nuvemshop: subtotal = produtos sem frete)
+      // Fallback: subtotal do pedido se disponível
       if (!valorProdutos) {
         valorProdutos = parseFloat((pedido as any).subtotal || pedido.total || body.total || '0')
       }
 
-      // Nota do pedido (onde o tracker.js injeta o bt=SESSION_ID)
       noteDoPedido = (pedido as any).note || body.note || ''
-
       console.log('[webhook] pedido', pedidoId, 'valorProdutos:', valorProdutos, 'note:', noteDoPedido)
     } catch (e) {
-      // Se API falhar, usa o que veio no webhook
       valorProdutos = parseFloat(body.subtotal || body.total || '0')
       console.warn('[webhook] erro ao buscar pedido via API, usando fallback:', e)
     }
@@ -66,7 +105,6 @@ export async function POST(req: NextRequest) {
     }
 
     // ─── Extrai session_id da nota do pedido ──────────────────────────────
-    // O tracker.js injeta: "bt=UUID" na nota do pedido
     const sessionId = extrairSessionId(noteDoPedido)
     console.log('[webhook] sessionId extraído:', sessionId)
 
@@ -103,10 +141,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-/**
- * Extrai o bt=SESSION_ID da nota do pedido.
- * O tracker.js injeta no formato: "bt=UUID" (pode ter texto antes/depois)
- */
 function extrairSessionId(note: string | null | undefined): string | null {
   if (!note) return null
   const match = note.match(/bt=([a-f0-9\-]{32,36})/i)
