@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
 import { obterLoja } from '@/lib/integrations/nuvemshop'
@@ -26,41 +26,45 @@ export default async function LojaPage({
   const supabase = await createServiceClient()
 
   // Busca o afiliado pelo ref_code
-  const { data: afiliado, error: erroAfiliado } = await supabase
+  const { data: afiliado } = await supabase
     .from('afiliados')
     .select('id, lojista_id')
     .eq('ref_code', ref)
     .eq('ativo', true)
     .single()
 
-  console.log('[loja] ref:', ref, 'afiliado:', afiliado, 'erro:', erroAfiliado?.message)
-
   if (!afiliado) {
     redirect('/')
   }
 
   // Busca dados do lojista para saber a URL da loja
-  const { data: lojista, error: erroLojista } = await supabase
+  const { data: lojista } = await supabase
     .from('lojistas')
     .select('nuvemshop_token, nuvemshop_store_id, nuvemshop_store_url')
     .eq('id', afiliado.lojista_id)
     .single()
 
-  console.log('[loja] lojista store_id:', lojista?.nuvemshop_store_id, 'store_url:', (lojista as any)?.nuvemshop_store_url, 'erro:', erroLojista?.message)
-
   if (!lojista?.nuvemshop_store_id) {
     redirect('/')
   }
 
+  // Captura IP real do visitante (para match com order/created)
+  const headersList = await headers()
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    null
+
   // Gera session_id único para rastrear esta visita
   const sessionId = generateSessionId()
 
-  // Registra o clique no banco
-  const ip = null // server component não tem acesso fácil ao IP real
+  // Registra o clique com IP e lojista_id para match preciso no order/created
   await supabase.from('cliques').insert({
     afiliado_id: afiliado.id,
+    lojista_id: afiliado.lojista_id,
     session_id: sessionId,
     url_origem: null,
+    ip,
   })
 
   // Determina URL da loja
@@ -71,7 +75,6 @@ export default async function LojaPage({
     try {
       const lojaInfo = await obterLoja(lojista.nuvemshop_token, lojista.nuvemshop_store_id)
       storeUrl = lojaInfo.url
-      // Salva para não precisar buscar da API toda vez
       await supabase
         .from('lojistas')
         .update({ nuvemshop_store_url: storeUrl } as any)
@@ -83,13 +86,10 @@ export default async function LojaPage({
 
   if (!storeUrl) redirect('/')
 
-  // Garante que a URL tem protocolo
   if (!storeUrl.startsWith('http')) {
     storeUrl = 'https://' + storeUrl
   }
 
-  // Redireciona para a loja com o session_id na URL
-  // O tracker.js na loja vai ler o ?sid= e setar o cookie no domínio correto
   const lojaUrl = new URL(storeUrl)
   lojaUrl.searchParams.set('bt_sid', sessionId)
   lojaUrl.searchParams.set('bt_ref', ref)

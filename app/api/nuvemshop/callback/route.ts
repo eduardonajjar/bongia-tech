@@ -97,11 +97,18 @@ export async function GET(req: NextRequest) {
       } as any)
       .eq('id', userId)
 
-    // 5. Registrar webhook para order/paid (ignora erro se já existe)
+    // 5. Registrar webhooks (ignora erro se já existe)
     await registrarWebhook(
       access_token,
       user_id,
       `${APP_URL}/api/webhooks/nuvemshop`
+    ).catch(() => {})
+
+    await registrarWebhook(
+      access_token,
+      user_id,
+      `${APP_URL}/api/webhooks/nuvemshop/order-created`,
+      'order/created'
     ).catch(() => {})
 
     // 5b. Registrar script tag do tracker em todas as páginas da loja

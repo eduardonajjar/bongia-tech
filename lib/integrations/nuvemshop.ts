@@ -46,9 +46,14 @@ async function nuvemshopRequest<T>(
   return res.json()
 }
 
-export async function registrarWebhook(token: string, storeId: string, callbackUrl: string) {
+export async function registrarWebhook(
+  token: string,
+  storeId: string,
+  callbackUrl: string,
+  event: string = 'order/paid'
+) {
   return nuvemshopRequest(token, storeId, 'POST', '/webhooks', {
-    event: 'order/paid',
+    event,
     url: callbackUrl,
   })
 }
@@ -77,6 +82,15 @@ export async function obterPedido(
   orderId: string
 ): Promise<NuvemshopOrder> {
   return nuvemshopRequest<NuvemshopOrder>(token, storeId, 'GET', `/orders/${orderId}`)
+}
+
+export async function atualizarNotaPedido(
+  token: string,
+  storeId: string,
+  orderId: string,
+  note: string
+): Promise<void> {
+  await nuvemshopRequest(token, storeId, 'PUT', `/orders/${orderId}`, { note })
 }
 
 export interface NuvemshopLoja {
