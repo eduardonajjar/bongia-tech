@@ -30,9 +30,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: 'Nome e email são obrigatórios' }, { status: 400 })
   }
 
-  const ref_code = generateRefCode(nome)
-
   const serviceClient = await createServiceClient()
+
+  // ── Limite de plano ───────────────────────────────────────────────────────
+  const { data: lojistaPlan } = await supabase
+    .from('lojistas')
+    .select('plano')
+    .eq('id', user.id)
+    .single()
+
+  const plano = lojistaPlan?.plano || 'starter'
+
+  if (plano === 'starter') {
+    const { count } = await serviceClient
+      .from('afiliados')
+      .select('id', { count: 'exact', head: true })
+      .eq('lojista_id', user.id)
+      .eq('ativo', true)
+
+    if ((count ?? 0) >= 3) {
+      return NextResponse.json(
+        { erro: 'Limite do plano Grátis atingido. Faça upgrade para o Pro e tenha afiliados ilimitados.', upgrade: true },
+        { status: 403 }
+      )
+    }
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const ref_code = generateRefCode(nome)
   const { data: afiliado, error } = await serviceClient
     .from('afiliados')
     .insert({

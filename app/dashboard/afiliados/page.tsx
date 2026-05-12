@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { UserPlus, Copy, Check, MoreHorizontal } from 'lucide-react'
+import { UserPlus, Copy, Check, Link } from 'lucide-react'
 import type { Afiliado } from '@/types/afiliado'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/[﻿﻿]/g, '').trim()
@@ -22,11 +22,14 @@ export default function AfiliadosPage() {
   const [filtro, setFiltro] = useState<'todos' | 'ativos' | 'inativos' | 'saldo'>('todos')
   const [modalAberto, setModalAberto] = useState(false)
   const [copiado, setCopiado] = useState<string | null>(null)
+  const [copiadoAcesso, setCopiadoAcesso] = useState<string | null>(null)
+  const [gerandoLink, setGerandoLink] = useState<string | null>(null)
   const [carregando, setCarregando] = useState(true)
 
   const [form, setForm] = useState({ nome: '', email: '', chave_pix: '', tipo_pix: 'cpf', comissao: '' })
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
+  const [limiteAtingido, setLimiteAtingido] = useState(false)
 
   useEffect(() => { carregar() }, [])
 
@@ -57,6 +60,11 @@ export default function AfiliadosPage() {
 
     const data = await res.json()
     if (!res.ok) {
+      if (data.upgrade) {
+        setLimiteAtingido(true)
+        setEnviando(false)
+        return
+      }
       setErro(data.erro || 'Erro ao adicionar afiliado')
       setEnviando(false)
       return
@@ -64,6 +72,7 @@ export default function AfiliadosPage() {
 
     setAfiliados((prev) => [data, ...prev])
     setModalAberto(false)
+    setLimiteAtingido(false)
     setForm({ nome: '', email: '', chave_pix: '', tipo_pix: 'cpf', comissao: '' })
     setEnviando(false)
   }
@@ -84,6 +93,21 @@ export default function AfiliadosPage() {
     setTimeout(() => setCopiado(null), 2000)
   }
 
+  async function copiarLinkAcesso(afiliadoId: string) {
+    setGerandoLink(afiliadoId)
+    try {
+      const res = await fetch(`/api/afiliado/gerar-link?id=${afiliadoId}`)
+      const data = await res.json()
+      if (data.ok && data.link) {
+        await navigator.clipboard.writeText(data.link)
+        setCopiadoAcesso(afiliadoId)
+        setTimeout(() => setCopiadoAcesso(null), 3000)
+      }
+    } finally {
+      setGerandoLink(null)
+    }
+  }
+
   const filtrados = afiliados.filter((a) => {
     if (filtro === 'ativos') return a.ativo
     if (filtro === 'inativos') return !a.ativo
@@ -99,7 +123,7 @@ export default function AfiliadosPage() {
           <p style={{ color: '#6b6560', fontSize: '12px', marginTop: '4px', fontWeight: 300 }}>{afiliados.length} afiliados cadastrados</p>
         </div>
         <button
-          onClick={() => setModalAberto(true)}
+          onClick={() => { setLimiteAtingido(false); setErro(''); setModalAberto(true) }}
           style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: '#f5f3f0', color: '#0c0b0a',
@@ -138,7 +162,7 @@ export default function AfiliadosPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                {['Nome', 'Email', 'Vendas totais', 'Saldo a pagar', 'Cliques', 'Status', 'Link', ''].map((h) => (
+                {['Nome', 'Email', 'Vendas totais', 'Saldo a pagar', 'Cliques', 'Status', 'Link afiliado', 'Acesso painel', ''].map((h) => (
                   <th key={h} style={{
                     padding: '10px 24px', textAlign: 'left',
                     fontSize: '10px', fontWeight: 400, color: '#4a4440',
@@ -177,6 +201,22 @@ export default function AfiliadosPage() {
                     >
                       {copiado === a.ref_code ? <Check style={{ width: '12px', height: '12px' }} /> : <Copy style={{ width: '12px', height: '12px' }} />}
                       {copiado === a.ref_code ? 'Copiado!' : 'Copiar link'}
+                    </button>
+                  </td>
+                  <td style={{ padding: '12px 24px' }}>
+                    <button
+                      onClick={() => copiarLinkAcesso(a.id)}
+                      disabled={gerandoLink === a.id}
+                      title="Gera link de acesso ao painel (válido 1h). Envie ao afiliado via WhatsApp."
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '4px',
+                        fontSize: '12px', color: copiadoAcesso === a.id ? '#f5f3f0' : '#6b6560',
+                        background: 'none', border: 'none', cursor: 'pointer', fontWeight: 300,
+                        opacity: gerandoLink === a.id ? 0.5 : 1,
+                      }}
+                    >
+                      {copiadoAcesso === a.id ? <Check style={{ width: '12px', height: '12px' }} /> : <Link style={{ width: '12px', height: '12px' }} />}
+                      {gerandoLink === a.id ? 'Gerando...' : copiadoAcesso === a.id ? 'Copiado!' : 'Link acesso'}
                     </button>
                   </td>
                   <td style={{ padding: '12px 24px' }}>
@@ -264,7 +304,31 @@ export default function AfiliadosPage() {
                 </div>
               </div>
 
-              {erro && (
+              {limiteAtingido && (
+                <div style={{
+                  background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)',
+                  padding: '14px', display: 'flex', flexDirection: 'column', gap: '10px',
+                }}>
+                  <p style={{ fontSize: '13px', color: '#fbbf24', fontWeight: 500, margin: 0 }}>
+                    Limite do plano Grátis atingido
+                  </p>
+                  <p style={{ fontSize: '12px', color: '#a09890', fontWeight: 300, margin: 0 }}>
+                    O plano Grátis permite até 3 afiliados. Faça upgrade para o Pro e tenha afiliados ilimitados.
+                  </p>
+                  <a
+                    href="/dashboard/pagamentos"
+                    style={{
+                      display: 'inline-block', background: '#d97706', color: '#fff',
+                      padding: '8px 16px', fontSize: '12px', fontWeight: 500,
+                      textDecoration: 'none', textAlign: 'center',
+                    }}
+                  >
+                    Ver planos → Pro por R$49/mês
+                  </a>
+                </div>
+              )}
+
+              {erro && !limiteAtingido && (
                 <p style={{
                   fontSize: '13px', color: '#f87171',
                   background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
@@ -275,7 +339,7 @@ export default function AfiliadosPage() {
               <div style={{ display: 'flex', gap: '12px', paddingTop: '8px' }}>
                 <button
                   type="button"
-                  onClick={() => { setModalAberto(false); setErro('') }}
+                  onClick={() => { setModalAberto(false); setErro(''); setLimiteAtingido(false) }}
                   style={{
                     flex: 1, background: 'transparent',
                     border: '1px solid rgba(255,255,255,0.1)', color: '#6b6560',
