@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import ParticleField from '@/components/ParticleField'
 
 // SVG chart mockup - area chart crescente (30 dias)
 function ChartMockup() {
@@ -53,14 +54,6 @@ export default function Home() {
 
       {/* Animações CSS globais */}
       <style>{`
-        @keyframes glow-breathe {
-          0%, 100% { opacity: 0.55; transform: scale(1) translateY(0px); }
-          50% { opacity: 0.85; transform: scale(1.07) translateY(-12px); }
-        }
-        @keyframes glow-breathe-2 {
-          0%, 100% { opacity: 0.3; transform: scale(1) translateX(0px); }
-          50% { opacity: 0.5; transform: scale(1.05) translateX(10px); }
-        }
         @keyframes fade-up {
           from { opacity: 0; transform: translateY(22px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -103,21 +96,15 @@ export default function Home() {
         padding: '0 2rem 5rem',
         paddingTop: '56px',
       }}>
-        {/* Glow orbs animados */}
+        {/* Glow ambiente estático atrás das partículas */}
         <div style={{
-          position: 'absolute', top: '8%', left: '5%',
-          width: '560px', height: '480px', borderRadius: '50%',
-          background: 'radial-gradient(ellipse, rgba(217,119,6,0.22) 0%, rgba(217,119,6,0.06) 45%, transparent 72%)',
-          animation: 'glow-breathe 6s ease-in-out infinite',
+          position: 'absolute', top: '15%', left: '-8%',
+          width: '700px', height: '550px', borderRadius: '50%',
+          background: 'radial-gradient(ellipse, rgba(217,119,6,0.13) 0%, rgba(217,119,6,0.04) 50%, transparent 75%)',
           pointerEvents: 'none', zIndex: 0,
         }} />
-        <div style={{
-          position: 'absolute', top: '30%', right: '-5%',
-          width: '420px', height: '380px', borderRadius: '50%',
-          background: 'radial-gradient(ellipse, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, transparent 75%)',
-          animation: 'glow-breathe-2 8s ease-in-out infinite',
-          pointerEvents: 'none', zIndex: 0,
-        }} />
+        {/* Campo de partículas âmbar */}
+        <ParticleField />
 
         <div style={{ maxWidth: '1200px', width: '100%', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: '760px' }}>
