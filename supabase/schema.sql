@@ -15,7 +15,7 @@ CREATE TABLE lojistas (
   nuvemshop_store_id      TEXT,
   asaas_api_key           TEXT, -- armazenado criptografado (AES-256)
   ativo                   BOOLEAN DEFAULT true,
-  trial_ate               TIMESTAMPTZ DEFAULT (now() + INTERVAL '14 days'),
+  trial_ate               TIMESTAMPTZ DEFAULT (now() + INTERVAL '30 days'),
   criado_em               TIMESTAMPTZ DEFAULT now()
 );
 
