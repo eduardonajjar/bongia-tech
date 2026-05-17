@@ -473,14 +473,21 @@ export default function Home() {
             <p style={{ fontSize: '14px', color: textSecondary, marginTop: '0.75rem', fontWeight: 300 }}>Sem cartão. Sem surpresa. Cancela quando quiser.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: border, maxWidth: '720px' }}>
-            {/* Starter */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: border, maxWidth: '1000px' }}>
+
+            {/* Grátis */}
             <div style={{ background: boxBg, padding: '2.5rem' }}>
-              <p style={{ fontSize: '11px', color: textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 400 }}>Starter</p>
-              <p style={{ fontFamily: 'var(--serif)', fontSize: '3rem', color: textPrimary, marginBottom: '0.25rem' }}>Grátis</p>
+              <p style={{ fontSize: '11px', color: textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 400 }}>Grátis</p>
+              <p style={{ fontFamily: 'var(--serif)', fontSize: '3rem', color: textPrimary, marginBottom: '0.25rem' }}>R$0</p>
               <p style={{ fontSize: '12px', color: textMuted, marginBottom: '2rem', fontWeight: 300 }}>Para sempre — sem cartão</p>
               <div style={{ borderTop: `1px solid ${border}`, paddingTop: '1.5rem', marginBottom: '2rem' }}>
-                {['Até 3 afiliados', 'Rastreamento automático', 'Painel do lojista', 'Portal do afiliado', 'Integração Nuvemshop'].map((f, i) => (
+                {[
+                  'Até 3 afiliados',
+                  'Rastreamento automático',
+                  'Dashboard do lojista',
+                  'Portal do afiliado',
+                  'Integração Nuvemshop',
+                ].map((f, i) => (
                   <div key={i} style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
                     <span style={{ color: '#22c55e', fontSize: '13px', flexShrink: 0 }}>✓</span>
                     <span style={{ fontSize: '13px', color: textSecondary, fontWeight: 300 }}>{f}</span>
@@ -496,26 +503,25 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Pro */}
+            {/* Starter */}
             <div style={{ background: boxBg, padding: '2.5rem', position: 'relative' }}>
               <div style={{
                 position: 'absolute', top: '1.5rem', right: '1.5rem',
                 fontSize: '10px', color: '#0c0b0a', background: textPrimary,
                 padding: '3px 8px', fontWeight: 500,
               }}>POPULAR</div>
-              <p style={{ fontSize: '11px', color: textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 400 }}>Pro</p>
+              <p style={{ fontSize: '11px', color: textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 400 }}>Starter</p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                <p style={{ fontFamily: 'var(--serif)', fontSize: '3rem', color: textPrimary }}>R$49</p>
+                <p style={{ fontFamily: 'var(--serif)', fontSize: '3rem', color: textPrimary }}>R$149</p>
                 <p style={{ fontSize: '13px', color: textMuted, fontWeight: 300 }}>/mês</p>
               </div>
               <p style={{ fontSize: '12px', color: textMuted, marginBottom: '2rem', fontWeight: 300 }}>30 dias grátis para testar</p>
               <div style={{ borderTop: `1px solid ${border}`, paddingTop: '1.5rem', marginBottom: '2rem' }}>
                 {[
-                  'Afiliados ilimitados',
+                  'Até 50 afiliados',
                   'Rastreamento automático',
-                  'Painel do lojista em tempo real',
+                  'Dashboard em tempo real',
                   'Portal do afiliado com login próprio',
-                  'Atribuição por produto (valor + quantidade)',
                   'Emails automáticos para afiliados',
                   'Exportar CSV para pagamento',
                   'Integração nativa Nuvemshop',
@@ -537,6 +543,50 @@ export default function Home() {
                 Sem cartão. Cancela em 1 clique.
               </p>
             </div>
+
+            {/* Pro */}
+            <div style={{ background: boxBg, padding: '2.5rem' }}>
+              <p style={{ fontSize: '11px', color: textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 400 }}>Pro</p>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <p style={{ fontFamily: 'var(--serif)', fontSize: '3rem', color: textPrimary }}>R$299</p>
+                <p style={{ fontSize: '13px', color: textMuted, fontWeight: 300 }}>/mês</p>
+              </div>
+              <p style={{ fontSize: '12px', color: textMuted, marginBottom: '2rem', fontWeight: 300 }}>30 dias grátis para testar</p>
+              <div style={{ borderTop: `1px solid ${border}`, paddingTop: '1.5rem', marginBottom: '2rem' }}>
+                {[
+                  'Afiliados ilimitados',
+                  'Rastreamento automático',
+                  'Dashboard em tempo real',
+                  'Portal do afiliado com login próprio',
+                  'Emails automáticos para afiliados',
+                  'Exportar CSV para pagamento',
+                  'PIX automático para afiliados — em breve',
+                  'Relatórios avançados — em breve',
+                  'Integração nativa Nuvemshop',
+                ].map((f, i) => {
+                  const emBreve = f.includes('em breve')
+                  return (
+                    <div key={i} style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <span style={{ color: emBreve ? '#d97706' : '#22c55e', fontSize: '13px', flexShrink: 0 }}>
+                        {emBreve ? '◎' : '✓'}
+                      </span>
+                      <span style={{ fontSize: '13px', color: emBreve ? textMuted : textSecondary, fontWeight: 300 }}>{f}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              <Link href="/registro" style={{
+                display: 'block', textAlign: 'center', background: 'transparent',
+                color: textPrimary, border: `1px solid rgba(255,255,255,0.2)`,
+                padding: '13px', textDecoration: 'none', fontSize: '14px', fontWeight: 400,
+              }}>
+                Começar 30 dias grátis
+              </Link>
+              <p style={{ textAlign: 'center', fontSize: '11px', color: textMuted, marginTop: '0.75rem', fontWeight: 300 }}>
+                Sem cartão. Cancela em 1 clique.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
