@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { TrendingUp, Users, ShoppingBag, DollarSign, AlertCircle } from 'lucide-react'
+import VendasLineChart, { DiaVenda } from '@/components/charts/VendasLineChart'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -8,8 +9,9 @@ export default async function DashboardPage() {
 
   const hoje = new Date()
   const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString()
+  const trintaDiasAtras = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-  const [vendasMes, afiliados, saldoPendente] = await Promise.all([
+  const [vendasMes, afiliados, saldoPendente, vendasGrafico] = await Promise.all([
     supabase
       .from('vendas')
       .select('valor_pedido, valor_comissao, status')
@@ -27,6 +29,14 @@ export default async function DashboardPage() {
       .eq('lojista_id', user!.id)
       .eq('ativo', true)
       .gt('saldo', 0),
+    // Vendas dos últimos 30 dias para o gráfico
+    supabase
+      .from('vendas')
+      .select('valor_pedido, valor_comissao, criado_em')
+      .eq('lojista_id', user!.id)
+      .gte('criado_em', trintaDiasAtras)
+      .neq('status', 'cancelado')
+      .order('criado_em', { ascending: true }),
   ])
 
   const totalVendasMes = vendasMes.data?.reduce((s, v) => s + v.valor_pedido, 0) || 0
@@ -37,8 +47,25 @@ export default async function DashboardPage() {
 
   const top5 = afiliados.data?.slice(0, 5) || []
 
+  // Agrupa vendas por dia para o gráfico
+  const mapaVendas: Record<string, DiaVenda> = {}
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000)
+    const chave = d.toISOString().slice(0, 10)
+    const dia = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
+    mapaVendas[chave] = { dia, vendas: 0, comissoes: 0, pedidos: 0 }
+  }
+  for (const v of vendasGrafico.data || []) {
+    const chave = v.criado_em.slice(0, 10)
+    if (mapaVendas[chave]) {
+      mapaVendas[chave].vendas += v.valor_pedido
+      mapaVendas[chave].comissoes += v.valor_comissao
+      mapaVendas[chave].pedidos += 1
+    }
+  }
+  const dadosGrafico = Object.values(mapaVendas)
+
   // Aviso se há comissões pendentes há mais de 30 dias
-  const trintaDiasAtras = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
   const { data: pendentesAntigos } = await supabase
     .from('afiliados')
     .select('id')
@@ -103,6 +130,29 @@ export default async function DashboardPage() {
             <p style={{ fontSize: '11px', color: '#4a4440', fontWeight: 300 }}>{card.sub}</p>
           </div>
         ))}
+      </div>
+
+      {/* Gráfico — Vendas dos últimos 30 dias */}
+      <div style={{ background: '#111010', border: '1px solid rgba(255,255,255,0.07)', marginBottom: '2rem' }}>
+        <div style={{
+          padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.07)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <h2 style={{ fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>Vendas dos últimos 30 dias</h2>
+          <div style={{ display: 'flex', gap: '1rem', fontSize: '11px', fontWeight: 300 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6b6560' }}>
+              <span style={{ width: '20px', height: '1px', background: '#f5f3f0', display: 'inline-block' }} />
+              Vendas
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#6b6560' }}>
+              <span style={{ width: '20px', height: '1px', background: '#d97706', display: 'inline-block' }} />
+              Comissões
+            </span>
+          </div>
+        </div>
+        <div style={{ padding: '1rem 0.5rem 0.5rem' }}>
+          <VendasLineChart dados={dadosGrafico} mostrarComissao={true} />
+        </div>
       </div>
 
       {/* Top afiliados */}

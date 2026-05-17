@@ -69,7 +69,7 @@ export default function RegistroPage() {
             <h1 style={{ fontFamily: 'var(--serif)', fontStyle: 'italic', fontSize: '1.5rem', color: '#f5f3f0', fontWeight: 400 }}>
               BongiaTech
             </h1>
-            <p style={{ color: '#6b6560', marginTop: '4px', fontSize: '13px', fontWeight: 300 }}>14 dias grátis — sem cartão</p>
+            <p style={{ color: '#6b6560', marginTop: '4px', fontSize: '13px', fontWeight: 300 }}>30 dias grátis — sem cartão</p>
           </div>
 
           {!modoEmail ? (

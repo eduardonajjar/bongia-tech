@@ -8,6 +8,13 @@ const STATUS_LABEL: Record<string, { label: string; color: string }> = {
   cancelado: { label: 'Cancelado', color: '#4a4440' },
 }
 
+interface Produto {
+  nome: string
+  quantidade: number
+  preco_unitario: number
+  total: number
+}
+
 export default async function VendasPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -42,7 +49,7 @@ export default async function VendasPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                  {['Data', 'Afiliado', 'Pedido ID', 'Valor do pedido', 'Comissão', 'Status'].map((h) => (
+                  {['Data', 'Afiliado', 'Pedido', 'Produtos', 'Valor do pedido', 'Comissão', 'Status'].map((h) => (
                     <th key={h} style={{
                       padding: '10px 24px', textAlign: 'left',
                       fontSize: '10px', fontWeight: 400, color: '#4a4440',
@@ -57,6 +64,8 @@ export default async function VendasPage() {
                 {vendas.map((v) => {
                   const status = STATUS_LABEL[v.status] || STATUS_LABEL.pendente
                   const afiliado = v.afiliados as { nome: string } | null
+                  const produtos: Produto[] = v.produtos || []
+                  const numeroPedido = v.numero_pedido ? `#${v.numero_pedido}` : `#${v.pedido_id}`
                   return (
                     <tr key={v.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                       <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', whiteSpace: 'nowrap', fontWeight: 300 }}>
@@ -65,8 +74,26 @@ export default async function VendasPage() {
                       <td style={{ padding: '12px 24px', fontSize: '13px', fontWeight: 400, color: '#f5f3f0' }}>
                         {afiliado?.nome || '—'}
                       </td>
-                      <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', fontFamily: 'monospace', fontWeight: 300 }}>
-                        #{v.pedido_id}
+                      <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', fontFamily: 'monospace', fontWeight: 300, whiteSpace: 'nowrap' }}>
+                        {numeroPedido}
+                      </td>
+                      <td style={{ padding: '12px 24px', fontSize: '12px', color: '#6b6560', fontWeight: 300, minWidth: '200px' }}>
+                        {produtos.length > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            {produtos.map((p, i) => (
+                              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+                                <span style={{ color: '#f5f3f0', fontWeight: 300 }}>
+                                  {p.quantidade}× {p.nome}
+                                </span>
+                                <span style={{ whiteSpace: 'nowrap', color: '#6b6560' }}>
+                                  {formatCurrency(p.total)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span style={{ color: '#4a4440' }}>—</span>
+                        )}
                       </td>
                       <td style={{ padding: '12px 24px', fontSize: '13px', color: '#6b6560', fontWeight: 300 }}>
                         {formatCurrency(v.valor_pedido)}

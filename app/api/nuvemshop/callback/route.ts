@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createServiceClient } from '@/lib/supabase/server'
-import { trocarCodigoPorToken, obterLoja, registrarWebhook, registrarScriptTag, extrairNomeLoja } from '@/lib/integrations/nuvemshop'
+import { trocarCodigoPorToken, obterLoja, registrarWebhook, registrarScriptTag, extrairNomeLoja, criarOuObterCustomFieldBtSession } from '@/lib/integrations/nuvemshop'
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/[﻿]/g, '').trim()
 
@@ -86,8 +86,8 @@ export async function GET(req: NextRequest) {
     }
 
     // 4. Salvar token Nuvemshop + store_id + store_url no lojista
-    const storeUrl = loja.url || null
-    await service
+    const storeUrl = loja.url || loja.original_domain || null
+    const { error: erroUpdate } = await admin
       .from('lojistas')
       .update({
         nuvemshop_token: access_token,
@@ -96,6 +96,12 @@ export async function GET(req: NextRequest) {
         nome,
       } as any)
       .eq('id', userId)
+
+    if (erroUpdate) {
+      console.error('[callback] ERRO ao salvar token no lojista:', erroUpdate.message)
+      throw new Error(`Erro ao salvar dados da loja: ${erroUpdate.message}`)
+    }
+    console.log('[callback] step 4: token e store_id salvos para lojista', userId)
 
     // 5. Registrar webhooks (ignora erro se já existe)
     await registrarWebhook(
@@ -117,6 +123,16 @@ export async function GET(req: NextRequest) {
       user_id,
       `${APP_URL}/tracker.js`
     ).catch(() => {})
+
+    // 5c. Criar custom field bt_session para rastreamento invisível no pedido
+    const customFieldId = await criarOuObterCustomFieldBtSession(access_token, user_id).catch(() => null)
+    if (customFieldId) {
+      await admin
+        .from('lojistas')
+        .update({ nuvemshop_custom_field_id: customFieldId } as any)
+        .eq('id', userId)
+      console.log('[callback] custom field bt_session criado/obtido:', customFieldId)
+    }
 
     console.log('[callback] step 6: gerando magic link para', email)
     // 6. Gerar magic link server-side

@@ -313,17 +313,17 @@ export default function AfiliadosPage() {
                     Limite do plano Grátis atingido
                   </p>
                   <p style={{ fontSize: '12px', color: '#a09890', fontWeight: 300, margin: 0 }}>
-                    O plano Grátis permite até 3 afiliados. Faça upgrade para o Pro e tenha afiliados ilimitados.
+                    O plano Grátis permite até 3 afiliados. Faça upgrade para o Starter e tenha até 50 afiliados por R$149/mês.
                   </p>
                   <a
-                    href="/dashboard/pagamentos"
+                    href="/#precos"
                     style={{
                       display: 'inline-block', background: '#d97706', color: '#fff',
                       padding: '8px 16px', fontSize: '12px', fontWeight: 500,
                       textDecoration: 'none', textAlign: 'center',
                     }}
                   >
-                    Ver planos → Pro por R$49/mês
+                    Ver planos → Starter por R$149/mês
                   </a>
                 </div>
               )}

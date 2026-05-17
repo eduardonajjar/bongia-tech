@@ -1,11 +1,20 @@
 import { createServiceClient } from '@/lib/supabase/server'
 
+export interface ProdutoVenda {
+  nome: string
+  quantidade: number
+  preco_unitario: number
+  total: number
+}
+
 export async function atribuirVenda(dados: {
   lojistaId: string
   pedidoId: string
   valorProdutos: number   // valor só dos produtos (sem frete)
   sessionId: string | null
   comissaoPadrao: number
+  numeroPedido?: string
+  produtos?: ProdutoVenda[]
 }) {
   if (!dados.sessionId) {
     console.log('[attribution] sem sessionId — venda não atribuída')
@@ -72,6 +81,8 @@ export async function atribuirVenda(dados: {
       valor_comissao: valorComissao,
       status: 'confirmado',
       session_id: dados.sessionId,
+      numero_pedido: dados.numeroPedido ?? null,
+      produtos: dados.produtos ?? null,
     })
     .select()
     .single()

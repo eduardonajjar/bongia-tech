@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from 'crypto'
 import { createServiceClient } from '@/lib/supabase/server'
 import { atribuirVenda } from '@/lib/tracking/attribution'
 import { enviarNotificacaoVenda } from '@/lib/integrations/resend'
-import { obterPedido } from '@/lib/integrations/nuvemshop'
+import { obterPedido, obterSessionIdDoPedido } from '@/lib/integrations/nuvemshop'
 
 const stripBOM = (s: string) => (s || '').replace(/[﻿]/g, '').trim()
 
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     const { data: lojista } = await supabase
       .from('lojistas')
-      .select('id, comissao_padrao, nuvemshop_token')
+      .select('id, comissao_padrao, nuvemshop_token, nuvemshop_custom_field_id')
       .eq('nuvemshop_store_id', storeId)
       .eq('ativo', true)
       .single()
@@ -74,18 +74,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, erro: 'Lojista não encontrado' }, { status: 404 })
     }
 
-    // ─── Busca pedido completo via API para ter subtotal e note precisos ───
+    // ─── Busca pedido completo via API para ter subtotal, note e produtos ──
     let valorProdutos = 0
     let noteDoPedido = body.note || ''
+    let numeroPedido: string | undefined
+    let produtos: { nome: string; quantidade: number; preco_unitario: number; total: number }[] | undefined
 
     try {
       const pedido = await obterPedido(lojista.nuvemshop_token, storeId, pedidoId)
 
-      // Valor base = soma dos produtos (price × quantity) — exclui frete
+      // Número legível do pedido (ex: "1042")
+      numeroPedido = String((pedido as any).number || pedidoId)
+
+      // Produtos com nome, qtd, preço unitário e total
       if (pedido.products && Array.isArray(pedido.products)) {
-        valorProdutos = pedido.products.reduce(function (soma: number, item: any) {
-          return soma + (parseFloat(item.price || '0') * (item.quantity || 1))
-        }, 0)
+        produtos = pedido.products.map((item: any) => {
+          const precoUnit = parseFloat(item.price || '0')
+          const qty = item.quantity || 1
+          return {
+            nome: item.name || 'Produto',
+            quantidade: qty,
+            preco_unitario: precoUnit,
+            total: parseFloat((precoUnit * qty).toFixed(2)),
+          }
+        })
+        valorProdutos = produtos.reduce((s, p) => s + p.total, 0)
       }
 
       // Fallback: subtotal do pedido se disponível
@@ -94,7 +107,7 @@ export async function POST(req: NextRequest) {
       }
 
       noteDoPedido = (pedido as any).note || body.note || ''
-      console.log('[webhook] pedido', pedidoId, 'valorProdutos:', valorProdutos, 'note:', noteDoPedido)
+      console.log('[webhook] pedido', numeroPedido, 'valorProdutos:', valorProdutos, 'note:', noteDoPedido)
     } catch (e) {
       valorProdutos = parseFloat(body.subtotal || body.total || '0')
       console.warn('[webhook] erro ao buscar pedido via API, usando fallback:', e)
@@ -104,9 +117,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, erro: 'Valor do pedido inválido' }, { status: 400 })
     }
 
-    // ─── Extrai session_id da nota do pedido ──────────────────────────────
-    const sessionId = extrairSessionId(noteDoPedido)
-    console.log('[webhook] sessionId extraído:', sessionId)
+    // ─── Extrai session_id: custom field (novo) → nota (retrocompatível) ──
+    let sessionId: string | null = null
+    const customFieldId = (lojista as any).nuvemshop_custom_field_id as string | null
+
+    if (customFieldId) {
+      sessionId = await obterSessionIdDoPedido(
+        lojista.nuvemshop_token, storeId, pedidoId, customFieldId
+      ).catch(() => null)
+      if (sessionId) console.log('[webhook] sessionId via custom field:', sessionId)
+    }
+
+    // Fallback: lê da nota do pedido (pedidos antes da migração)
+    if (!sessionId) {
+      sessionId = extrairSessionId(noteDoPedido)
+      if (sessionId) console.log('[webhook] sessionId via nota (legado):', sessionId)
+    }
+
+    console.log('[webhook] sessionId final:', sessionId)
 
     const venda = await atribuirVenda({
       lojistaId: lojista.id,
@@ -114,6 +142,8 @@ export async function POST(req: NextRequest) {
       valorProdutos,
       sessionId,
       comissaoPadrao: lojista.comissao_padrao,
+      numeroPedido,
+      produtos,
     })
 
     if (venda) {

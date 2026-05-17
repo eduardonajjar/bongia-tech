@@ -74,7 +74,7 @@ export default async function LojaPage({
   if (!storeUrl && lojista.nuvemshop_token) {
     try {
       const lojaInfo = await obterLoja(lojista.nuvemshop_token, lojista.nuvemshop_store_id)
-      storeUrl = lojaInfo.url
+      storeUrl = lojaInfo.url || lojaInfo.original_domain || null
       await supabase
         .from('lojistas')
         .update({ nuvemshop_store_url: storeUrl } as any)
