@@ -1,45 +1,84 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { gerarTokenMagico } from '@/lib/afiliado/session'
+import { Resend } from 'resend'
 
-// Endpoint temporário de debug — remover após diagnóstico
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+// Debug — replica exatamente o solicitar-acesso passo a passo
 export async function GET(req: NextRequest) {
-  const resultado: Record<string, unknown> = {}
+  const email = req.nextUrl.searchParams.get('email') || 'eduardonajjar2@gmail.com'
+  const emailLimpo = email.toLowerCase().trim()
+  const passos: Record<string, unknown> = {}
 
-  // 1. Verifica env vars (só presença, não valor)
-  resultado.envs = {
-    SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-    SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    RESEND_API_KEY: !!process.env.RESEND_API_KEY,
-    APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'não definida',
+  // Passo 1: createServiceClient
+  let supabase
+  try {
+    supabase = await createServiceClient()
+    passos['1_serviceClient'] = 'ok'
+  } catch (e) {
+    return NextResponse.json({ falhou_em: '1_serviceClient', erro: String(e), passos })
   }
 
-  // 2. Testa createServiceClient
+  // Passo 2: query afiliados
+  let afiliados
   try {
-    const supabase = await createServiceClient()
-    resultado.serviceClient = 'ok'
-
-    // 3. Testa query na tabela afiliados
     const { data, error } = await supabase
       .from('afiliados')
-      .select('id, email')
+      .select('id, email, ativo')
+      .eq('email', emailLimpo)
       .limit(1)
-
     if (error) {
-      resultado.supabaseQuery = { erro: error.message, code: error.code }
-    } else {
-      resultado.supabaseQuery = { ok: true, registros: data?.length ?? 0 }
+      return NextResponse.json({ falhou_em: '2_query', erro: error.message, passos })
     }
-  } catch (e: unknown) {
-    resultado.serviceClient = { erro: e instanceof Error ? e.message : String(e) }
+    afiliados = data
+    passos['2_query'] = { encontrou: data?.length ?? 0, registros: data }
+  } catch (e) {
+    return NextResponse.json({ falhou_em: '2_query_catch', erro: String(e), passos })
   }
 
-  // 4. Testa Resend API key (só verifica se está no formato certo)
-  const resendKey = process.env.RESEND_API_KEY || ''
-  resultado.resend = {
-    keyPresente: resendKey.length > 0,
-    keyPareceLegitima: resendKey.startsWith('re_') && resendKey.length > 20,
-    keyValor: resendKey.length > 0 ? `${resendKey.substring(0, 6)}...` : 'VAZIA',
+  // Passo 3: verificar ativo
+  passos['3_ativo'] = { afiliadosLen: afiliados?.length, isEmpty: !afiliados || afiliados.length === 0 }
+  if (!afiliados || afiliados.length === 0) {
+    passos['resultado'] = 'retornaria ok:true (email nao encontrado ou inativo)'
+    return NextResponse.json(passos)
   }
 
-  return NextResponse.json(resultado)
+  // Passo 4: gerarTokenMagico
+  let token, link
+  try {
+    token = gerarTokenMagico(emailLimpo)
+    link = `${APP_URL}/api/afiliado/auth?token=${encodeURIComponent(token)}`
+    passos['4_token'] = 'ok'
+    passos['4_link'] = link
+  } catch (e) {
+    return NextResponse.json({ falhou_em: '4_token', erro: String(e), passos })
+  }
+
+  // Passo 5: Resend constructor
+  let resend
+  try {
+    const key = process.env.RESEND_API_KEY || ''
+    passos['5_resendKey'] = { len: key.length, prefix: key.substring(0, 8), hasBOM: key.charCodeAt(0) === 0xFEFF }
+    resend = new Resend(key)
+    passos['5_resendConstructor'] = 'ok'
+  } catch (e) {
+    return NextResponse.json({ falhou_em: '5_resend_constructor', erro: String(e), passos })
+  }
+
+  // Passo 6: Resend send (domínio pode não estar verificado)
+  try {
+    const r = await resend.emails.send({
+      from: 'BongiaTech <noreply@bongiatech.com.br>',
+      to: emailLimpo,
+      subject: '[TESTE DEBUG] Link de acesso',
+      html: `<p>Link: <a href="${link}">${link}</a></p>`,
+    })
+    passos['6_resendSend'] = { ok: true, id: (r as { id?: string }).id }
+  } catch (e) {
+    passos['6_resendSend'] = { falhou: true, erro: String(e) }
+  }
+
+  passos['resultado_final'] = 'retornaria ok:true'
+  return NextResponse.json(passos)
 }
