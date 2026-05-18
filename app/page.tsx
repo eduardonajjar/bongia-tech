@@ -84,7 +84,7 @@ export default function Home() {
             fontSize: '13px', color: '#0c0b0a', background: textPrimary,
             padding: '6px 16px', textDecoration: 'none', fontWeight: 500,
           }}>
-            Instalar na Nuvemshop
+            Começar grátis
           </Link>
         </div>
       </nav>
@@ -137,7 +137,7 @@ export default function Home() {
             lineHeight: 1.05, fontWeight: 400, marginBottom: '1.5rem', color: textPrimary,
           }}>
             Crie seu programa de afiliados<br />
-            <em>na Nuvemshop em minutos.</em>
+            <em>em minutos.</em>
           </h1>
           <p className="hero-sub" style={{ fontSize: '1.125rem', color: textSecondary, maxWidth: '560px', marginBottom: '2.5rem', fontWeight: 300, lineHeight: 1.65 }}>
             Convide influenciadores, parceiros e clientes para vender sua loja.
@@ -150,7 +150,7 @@ export default function Home() {
               padding: '13px 28px', textDecoration: 'none',
               fontSize: '14px', fontWeight: 500,
             }}>
-              Instalar na Nuvemshop — grátis por 30 dias
+              Criar conta — grátis por 30 dias
             </Link>
             <a href="#como-funciona" style={{ fontSize: '14px', color: textSecondary, textDecoration: 'none', fontWeight: 300 }}>
               Ver como funciona →
@@ -473,7 +473,7 @@ export default function Home() {
             <p style={{ fontSize: '14px', color: textSecondary, marginTop: '0.75rem', fontWeight: 300 }}>Sem cartão. Sem surpresa. Cancela quando quiser.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: border, maxWidth: '1000px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: border, maxWidth: '720px' }}>
 
             {/* Grátis */}
             <div style={{ background: boxBg, padding: '2.5rem' }}>
@@ -544,49 +544,35 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Pro */}
-            <div style={{ background: boxBg, padding: '2.5rem' }}>
-              <p style={{ fontSize: '11px', color: textMuted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem', fontWeight: 400 }}>Pro</p>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                <p style={{ fontFamily: 'var(--serif)', fontSize: '3rem', color: textPrimary }}>R$299</p>
-                <p style={{ fontSize: '13px', color: textMuted, fontWeight: 300 }}>/mês</p>
-              </div>
-              <p style={{ fontSize: '12px', color: textMuted, marginBottom: '2rem', fontWeight: 300 }}>30 dias grátis para testar</p>
-              <div style={{ borderTop: `1px solid ${border}`, paddingTop: '1.5rem', marginBottom: '2rem' }}>
-                {[
-                  'Afiliados ilimitados',
-                  'Rastreamento automático',
-                  'Dashboard em tempo real',
-                  'Portal do afiliado com login próprio',
-                  'Emails automáticos para afiliados',
-                  'Exportar CSV para pagamento',
-                  'PIX automático para afiliados — em breve',
-                  'Relatórios avançados — em breve',
-                  'Integração nativa Nuvemshop',
-                ].map((f, i) => {
-                  const emBreve = f.includes('em breve')
-                  return (
-                    <div key={i} style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
-                      <span style={{ color: emBreve ? '#d97706' : '#22c55e', fontSize: '13px', flexShrink: 0 }}>
-                        {emBreve ? '◎' : '✓'}
-                      </span>
-                      <span style={{ fontSize: '13px', color: emBreve ? textMuted : textSecondary, fontWeight: 300 }}>{f}</span>
-                    </div>
-                  )
-                })}
-              </div>
-              <Link href="/registro" style={{
-                display: 'block', textAlign: 'center', background: 'transparent',
-                color: textPrimary, border: `1px solid rgba(255,255,255,0.2)`,
-                padding: '13px', textDecoration: 'none', fontSize: '14px', fontWeight: 400,
-              }}>
-                Começar 30 dias grátis
-              </Link>
-              <p style={{ textAlign: 'center', fontSize: '11px', color: textMuted, marginTop: '0.75rem', fontWeight: 300 }}>
-                Sem cartão. Cancela em 1 clique.
+          </div>
+        </div>
+      </section>
+
+      {/* Outra plataforma */}
+      <section style={{ borderTop: `1px solid ${border}`, padding: '3rem 2rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: '1.5rem',
+            background: '#111010', border: `1px solid ${border}`, padding: '2rem 2.5rem',
+          }}>
+            <div>
+              <p style={{ fontSize: '14px', fontWeight: 400, color: textPrimary, marginBottom: '0.25rem' }}>
+                Usa outra plataforma de e-commerce?
+              </p>
+              <p style={{ fontSize: '13px', color: textSecondary, fontWeight: 300 }}>
+                Nuvemshop e Shopify são nossas integrações atuais. Se você usa outra plataforma, entre em contato — queremos entender seu caso.
               </p>
             </div>
-
+            <a href="mailto:suporte@bongiatech.com.br" style={{
+              flexShrink: 0,
+              fontSize: '13px', color: textPrimary,
+              border: `1px solid rgba(255,255,255,0.2)`,
+              padding: '10px 20px', textDecoration: 'none', fontWeight: 400,
+              whiteSpace: 'nowrap',
+            }}>
+              Falar com a equipe →
+            </a>
           </div>
         </div>
       </section>
@@ -598,7 +584,7 @@ export default function Home() {
             Pare de controlar afiliados no Excel.
           </h2>
           <p style={{ fontSize: '15px', color: textSecondary, marginBottom: '2.5rem', fontWeight: 300 }}>
-            Instale o Bongia na sua loja Nuvemshop e acompanhe cada venda automaticamente.
+            Lance seu programa de afiliados hoje e acompanhe cada venda automaticamente.
           </p>
           <Link href="/registro" style={{
             background: textPrimary, color: '#0c0b0a',
@@ -608,7 +594,7 @@ export default function Home() {
             Começar grátis agora
           </Link>
           <p style={{ fontSize: '12px', color: textMuted, marginTop: '1rem', fontWeight: 300 }}>
-            30 dias grátis · Sem cartão · Instalação em 1 clique na Nuvemshop
+            30 dias grátis · Sem cartão · Cancela quando quiser
           </p>
         </div>
       </section>
