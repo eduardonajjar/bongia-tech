@@ -1,8 +1,9 @@
 import { Resend } from 'resend'
 
 function getResend() {
-  // Strip BOM e espaços — problema comum ao colar API key no Vercel
-  const key = (process.env.RESEND_API_KEY || 'placeholder').replace(/^﻿/, '').trim()
+  // Remove BOM (U+FEFF = 65279) e espaços — problema ao colar key no Vercel
+  let key = (process.env.RESEND_API_KEY || 'placeholder').trim()
+  while (key.length > 0 && key.charCodeAt(0) === 0xFEFF) key = key.slice(1)
   return new Resend(key)
 }
 const FROM = 'BongiaTech <noreply@bongiatech.com.br>'
