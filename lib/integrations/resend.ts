@@ -1,7 +1,9 @@
 import { Resend } from 'resend'
 
 function getResend() {
-  return new Resend(process.env.RESEND_API_KEY || 'placeholder')
+  // Strip BOM e espaços — problema comum ao colar API key no Vercel
+  const key = (process.env.RESEND_API_KEY || 'placeholder').replace(/^﻿/, '').trim()
+  return new Resend(key)
 }
 const FROM = 'BongiaTech <noreply@bongiatech.com.br>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'

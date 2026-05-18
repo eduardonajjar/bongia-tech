@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
 
     // Tenta enviar email — ignora erro de domínio não verificado
     try {
-      const resend = new Resend(process.env.RESEND_API_KEY || '')
+      // Strip BOM e espaços da key (problema comum ao colar no Vercel)
+      const resendKey = (process.env.RESEND_API_KEY || '').replace(/^﻿/, '').trim()
+      const resend = new Resend(resendKey)
       await resend.emails.send({
         from: 'BongiaTech <noreply@bongiatech.com.br>',
         to: emailLimpo,
